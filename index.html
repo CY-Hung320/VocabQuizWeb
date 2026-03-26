@@ -244,6 +244,61 @@ body{
 .cf{position:fixed;width:10px;height:14px;border-radius:3px;animation:fall linear forwards;pointer-events:none;z-index:999}
 @keyframes pop{0%{transform:scale(.85);opacity:0}70%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
 .pop{animation:pop .28s ease forwards}
+
+/* ── Leaderboard & History ── */
+.lb-section{margin-top:20px;border-top:2px solid #f0f0f0;padding-top:16px}
+.lb-title{font-size:.95rem;font-weight:800;color:#3d3d6b;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lb-today-count{font-size:.75rem;color:#999;font-weight:600;margin-left:auto}
+.lb-empty{color:#ccc;font-size:.82rem;text-align:center;padding:16px 0}
+.lb-podium{display:flex;flex-direction:column;gap:8px}
+.lb-row{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-radius:13px;background:#f8f9ff;position:relative;overflow:hidden;
+}
+.lb-row.rank-1{background:linear-gradient(135deg,#fff8e1,#fff3cd);border:1.5px solid #ffd54f}
+.lb-row.rank-2{background:linear-gradient(135deg,#f5f5f5,#eeeeee);border:1.5px solid #ccc}
+.lb-row.rank-3{background:linear-gradient(135deg,#fff3e0,#ffe0b2);border:1.5px solid #ffb74d}
+.lb-rank{font-size:1.3rem;min-width:28px;text-align:center}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:.88rem;font-weight:700;color:#3d3d6b}
+.lb-detail{font-size:.68rem;color:#999;margin-top:1px}
+.lb-score-val{font-size:1.1rem;font-weight:800;color:#667eea}
+.lb-pct{font-size:.65rem;color:#999}
+
+.hist-toggle{
+  width:100%;margin-top:12px;background:none;border:1.5px solid #e8e8f0;
+  border-radius:12px;padding:10px;font-size:.82rem;font-weight:700;
+  color:#667eea;cursor:pointer;transition:.15s;
+}
+.hist-toggle:hover{background:#f4f4ff;border-color:#667eea}
+.hist-panel{display:none;margin-top:10px}
+.hist-panel.show{display:block}
+.hist-filters{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.hist-f-btn{
+  border:1.5px solid #e8e8f0;background:#fff;border-radius:8px;
+  padding:5px 10px;font-size:.72rem;font-weight:600;color:#666;
+  cursor:pointer;transition:.15s;
+}
+.hist-f-btn:hover{border-color:#667eea;color:#667eea}
+.hist-f-btn.active{background:#667eea;color:#fff;border-color:#667eea}
+.hist-list{max-height:300px;overflow-y:auto}
+.hist-item{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border-bottom:1px solid #f0f0f0;font-size:.78rem;
+}
+.hist-item:last-child{border-bottom:none}
+.hist-date{color:#999;min-width:70px;font-size:.7rem}
+.hist-who{font-weight:700;color:#3d3d6b;min-width:60px}
+.hist-grade{color:#667eea;font-weight:600;font-size:.7rem;min-width:45px}
+.hist-sc{margin-left:auto;font-weight:800;color:#3d3d6b}
+.hist-pct-bar{width:50px;height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-left:6px}
+.hist-pct-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#667eea,#764ba2)}
+.hist-summary{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;
+}
+.hist-stat{background:#f8f9ff;border-radius:10px;padding:10px;text-align:center}
+.hist-stat-num{font-size:1.1rem;font-weight:800;color:#3d3d6b}
+.hist-stat-lbl{font-size:.65rem;color:#999;margin-top:2px}
 </style>
 </head>
 <body>
@@ -303,6 +358,24 @@ body{
 
   <div class="alert-bar" id="alert-bar">
     <span>📌</span><span id="alert-txt"></span>
+  </div>
+
+  
+  <div class="lb-section" id="lb-section">
+    <div class="lb-title">🏆 今日排行榜 <span class="lb-today-count" id="lb-today-count"></span></div>
+    <div id="lb-podium" class="lb-podium">
+      <div class="lb-empty">今天還沒有人作答喔，快來挑戰吧！</div>
+    </div>
+    <button class="hist-toggle" id="hist-toggle" onclick="toggleHistory()">📊 查看歷史紀錄</button>
+    <div class="hist-panel" id="hist-panel">
+      <div class="hist-summary" id="hist-summary"></div>
+      <div class="hist-filters" id="hist-filters">
+        <button class="hist-f-btn active" onclick="filterHistory('all')">全部</button>
+        <button class="hist-f-btn" onclick="filterHistory('嘉駿(Jackson)')">嘉駿</button>
+        <button class="hist-f-btn" onclick="filterHistory('振凱(Max)')">振凱</button>
+      </div>
+      <div class="hist-list" id="hist-list"></div>
+    </div>
   </div>
 
   <button class="start-btn" id="start-btn" onclick="startQuiz()">開始考試 →</button>
@@ -794,6 +867,7 @@ function nextQuestion() { clearCountdown(); qIdx++; renderQuestion(); }
 function showResult() {
   document.getElementById('q-bar').style.width='100%';
   finalizeQuiz(selGrade, selExam, wrongEnSet, corrEnSet);
+  addRecord(selName, selGrade, selExam, totalQ, score, totalQ * 5);
   showScreen('screen-result');
   const maxScore = totalQ * 5;
   const pct = Math.round(score / maxScore * 100);
@@ -893,7 +967,162 @@ function hidePhoto() {
 }
 function goMenu() {
   stopConfetti(); hidePhoto();
-  showScreen('screen-menu'); initWeakDots(); refreshAlert();
+  showScreen('screen-menu'); 
+// ═══════════════════════════════════════════
+//  PRACTICE HISTORY (10-year retention)
+// ═══════════════════════════════════════════
+const HISTORY_KEY = 'quiz_history';
+const TEN_YEARS_MS = 10 * 365.25 * 24 * 60 * 60 * 1000;
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+  catch { return []; }
+}
+function saveHistory(records) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(records));
+}
+function cleanOldHistory() {
+  const cutoff = Date.now() - TEN_YEARS_MS;
+  const records = getHistory().filter(r => r.ts >= cutoff);
+  saveHistory(records);
+  return records;
+}
+function addRecord(name, grade, exam, count, score, maxScore) {
+  const records = cleanOldHistory();
+  records.push({
+    ts: Date.now(),
+    name: name,
+    grade: grade,
+    exam: exam,
+    count: count,
+    score: score,
+    maxScore: maxScore,
+    pct: Math.round(score / maxScore * 100),
+  });
+  saveHistory(records);
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function formatDate(ts) {
+  const d = new Date(ts);
+  return (d.getMonth()+1) + '/' + d.getDate();
+}
+function formatDateTime(ts) {
+  const d = new Date(ts);
+  return d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate() + ' ' +
+    String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function getTodayRecords() {
+  const today = todayStr();
+  return getHistory().filter(r => {
+    const d = new Date(r.ts);
+    const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    return ds === today;
+  });
+}
+
+function renderLeaderboard() {
+  const todayRecs = getTodayRecords();
+  const countEl = document.getElementById('lb-today-count');
+  countEl.textContent = todayRecs.length > 0 ? `今日已練習 ${todayRecs.length} 次` : '';
+
+  const podium = document.getElementById('lb-podium');
+
+  if (todayRecs.length === 0) {
+    podium.innerHTML = '<div class="lb-empty">今天還沒有人作答喔，快來挑戰吧！</div>';
+    return;
+  }
+
+  // Sort by pct desc, then by score desc, then by time asc (earlier is better)
+  const sorted = [...todayRecs].sort((a, b) => {
+    if (b.pct !== a.pct) return b.pct - a.pct;
+    if (b.score !== a.score) return b.score - a.score;
+    return a.ts - b.ts;
+  });
+
+  const top3 = sorted.slice(0, 3);
+  const medals = ['🥇', '🥈', '🥉'];
+  const examNames = { midterm: '期中', final: '期末' };
+
+  podium.innerHTML = top3.map((r, i) => {
+    const avatar = r.name === '嘉駿(Jackson)' ? '🦁' : '🐯';
+    const displayName = r.name === '嘉駿(Jackson)' ? '嘉駿' : '振凱';
+    const time = new Date(r.ts);
+    const timeStr = String(time.getHours()).padStart(2,'0') + ':' + String(time.getMinutes()).padStart(2,'0');
+    return `<div class="lb-row rank-${i+1}">
+      <span class="lb-rank">${medals[i]}</span>
+      <div class="lb-info">
+        <div class="lb-name">${avatar} ${displayName}</div>
+        <div class="lb-detail">${r.grade}年級 ${examNames[r.exam]||r.exam} ${r.count}題 ・ ${timeStr}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="lb-score-val">${r.score}分</div>
+        <div class="lb-pct">${r.pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── History panel ──
+let histFilter = 'all';
+function toggleHistory() {
+  const panel = document.getElementById('hist-panel');
+  panel.classList.toggle('show');
+  if (panel.classList.contains('show')) renderHistory();
+}
+function filterHistory(f) {
+  histFilter = f;
+  document.querySelectorAll('.hist-f-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.includes(
+      f === 'all' ? '全部' : f === '嘉駿(Jackson)' ? '嘉駿' : '振凱'
+    ));
+  });
+  renderHistory();
+}
+function renderHistory() {
+  const allRecs = cleanOldHistory();
+  const filtered = histFilter === 'all' ? allRecs : allRecs.filter(r => r.name === histFilter);
+
+  // Summary
+  const summary = document.getElementById('hist-summary');
+  const totalPractice = filtered.length;
+  const avgPct = totalPractice > 0 ? Math.round(filtered.reduce((s,r) => s + r.pct, 0) / totalPractice) : 0;
+  const perfectCount = filtered.filter(r => r.pct === 100).length;
+  summary.innerHTML = `
+    <div class="hist-stat"><div class="hist-stat-num">${totalPractice}</div><div class="hist-stat-lbl">總練習次數</div></div>
+    <div class="hist-stat"><div class="hist-stat-num">${avgPct}%</div><div class="hist-stat-lbl">平均正確率</div></div>
+    <div class="hist-stat"><div class="hist-stat-num">${perfectCount}</div><div class="hist-stat-lbl">滿分次數</div></div>
+  `;
+
+  // List (newest first, max 100)
+  const list = document.getElementById('hist-list');
+  const show = [...filtered].reverse().slice(0, 100);
+  const examNames = { midterm: '期中', final: '期末' };
+
+  if (show.length === 0) {
+    list.innerHTML = '<div class="lb-empty">還沒有紀錄</div>';
+    return;
+  }
+
+  list.innerHTML = show.map(r => {
+    const displayName = r.name === '嘉駿(Jackson)' ? '嘉駿' : '振凱';
+    const avatar = r.name === '嘉駿(Jackson)' ? '🦁' : '🐯';
+    return `<div class="hist-item">
+      <span class="hist-date">${formatDateTime(r.ts)}</span>
+      <span class="hist-who">${avatar} ${displayName}</span>
+      <span class="hist-grade">${r.grade}年${examNames[r.exam]||''}</span>
+      <span class="hist-sc">${r.score}/${r.maxScore}</span>
+      <div class="hist-pct-bar"><div class="hist-pct-fill" style="width:${r.pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+initWeakDots();
+renderLeaderboard(); refreshAlert();
 }
 function retryQuiz() { stopConfetti(); hidePhoto(); startQuiz(); }
 
@@ -942,7 +1171,162 @@ function launchConfetti(pct=100){
 }
 function stopConfetti(){ confettiPieces.forEach(d=>d.remove()); confettiPieces=[]; }
 
+
+// ═══════════════════════════════════════════
+//  PRACTICE HISTORY (10-year retention)
+// ═══════════════════════════════════════════
+const HISTORY_KEY = 'quiz_history';
+const TEN_YEARS_MS = 10 * 365.25 * 24 * 60 * 60 * 1000;
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+  catch { return []; }
+}
+function saveHistory(records) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(records));
+}
+function cleanOldHistory() {
+  const cutoff = Date.now() - TEN_YEARS_MS;
+  const records = getHistory().filter(r => r.ts >= cutoff);
+  saveHistory(records);
+  return records;
+}
+function addRecord(name, grade, exam, count, score, maxScore) {
+  const records = cleanOldHistory();
+  records.push({
+    ts: Date.now(),
+    name: name,
+    grade: grade,
+    exam: exam,
+    count: count,
+    score: score,
+    maxScore: maxScore,
+    pct: Math.round(score / maxScore * 100),
+  });
+  saveHistory(records);
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function formatDate(ts) {
+  const d = new Date(ts);
+  return (d.getMonth()+1) + '/' + d.getDate();
+}
+function formatDateTime(ts) {
+  const d = new Date(ts);
+  return d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate() + ' ' +
+    String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function getTodayRecords() {
+  const today = todayStr();
+  return getHistory().filter(r => {
+    const d = new Date(r.ts);
+    const ds = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    return ds === today;
+  });
+}
+
+function renderLeaderboard() {
+  const todayRecs = getTodayRecords();
+  const countEl = document.getElementById('lb-today-count');
+  countEl.textContent = todayRecs.length > 0 ? `今日已練習 ${todayRecs.length} 次` : '';
+
+  const podium = document.getElementById('lb-podium');
+
+  if (todayRecs.length === 0) {
+    podium.innerHTML = '<div class="lb-empty">今天還沒有人作答喔，快來挑戰吧！</div>';
+    return;
+  }
+
+  // Sort by pct desc, then by score desc, then by time asc (earlier is better)
+  const sorted = [...todayRecs].sort((a, b) => {
+    if (b.pct !== a.pct) return b.pct - a.pct;
+    if (b.score !== a.score) return b.score - a.score;
+    return a.ts - b.ts;
+  });
+
+  const top3 = sorted.slice(0, 3);
+  const medals = ['🥇', '🥈', '🥉'];
+  const examNames = { midterm: '期中', final: '期末' };
+
+  podium.innerHTML = top3.map((r, i) => {
+    const avatar = r.name === '嘉駿(Jackson)' ? '🦁' : '🐯';
+    const displayName = r.name === '嘉駿(Jackson)' ? '嘉駿' : '振凱';
+    const time = new Date(r.ts);
+    const timeStr = String(time.getHours()).padStart(2,'0') + ':' + String(time.getMinutes()).padStart(2,'0');
+    return `<div class="lb-row rank-${i+1}">
+      <span class="lb-rank">${medals[i]}</span>
+      <div class="lb-info">
+        <div class="lb-name">${avatar} ${displayName}</div>
+        <div class="lb-detail">${r.grade}年級 ${examNames[r.exam]||r.exam} ${r.count}題 ・ ${timeStr}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="lb-score-val">${r.score}分</div>
+        <div class="lb-pct">${r.pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── History panel ──
+let histFilter = 'all';
+function toggleHistory() {
+  const panel = document.getElementById('hist-panel');
+  panel.classList.toggle('show');
+  if (panel.classList.contains('show')) renderHistory();
+}
+function filterHistory(f) {
+  histFilter = f;
+  document.querySelectorAll('.hist-f-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.includes(
+      f === 'all' ? '全部' : f === '嘉駿(Jackson)' ? '嘉駿' : '振凱'
+    ));
+  });
+  renderHistory();
+}
+function renderHistory() {
+  const allRecs = cleanOldHistory();
+  const filtered = histFilter === 'all' ? allRecs : allRecs.filter(r => r.name === histFilter);
+
+  // Summary
+  const summary = document.getElementById('hist-summary');
+  const totalPractice = filtered.length;
+  const avgPct = totalPractice > 0 ? Math.round(filtered.reduce((s,r) => s + r.pct, 0) / totalPractice) : 0;
+  const perfectCount = filtered.filter(r => r.pct === 100).length;
+  summary.innerHTML = `
+    <div class="hist-stat"><div class="hist-stat-num">${totalPractice}</div><div class="hist-stat-lbl">總練習次數</div></div>
+    <div class="hist-stat"><div class="hist-stat-num">${avgPct}%</div><div class="hist-stat-lbl">平均正確率</div></div>
+    <div class="hist-stat"><div class="hist-stat-num">${perfectCount}</div><div class="hist-stat-lbl">滿分次數</div></div>
+  `;
+
+  // List (newest first, max 100)
+  const list = document.getElementById('hist-list');
+  const show = [...filtered].reverse().slice(0, 100);
+  const examNames = { midterm: '期中', final: '期末' };
+
+  if (show.length === 0) {
+    list.innerHTML = '<div class="lb-empty">還沒有紀錄</div>';
+    return;
+  }
+
+  list.innerHTML = show.map(r => {
+    const displayName = r.name === '嘉駿(Jackson)' ? '嘉駿' : '振凱';
+    const avatar = r.name === '嘉駿(Jackson)' ? '🦁' : '🐯';
+    return `<div class="hist-item">
+      <span class="hist-date">${formatDateTime(r.ts)}</span>
+      <span class="hist-who">${avatar} ${displayName}</span>
+      <span class="hist-grade">${r.grade}年${examNames[r.exam]||''}</span>
+      <span class="hist-sc">${r.score}/${r.maxScore}</span>
+      <div class="hist-pct-bar"><div class="hist-pct-fill" style="width:${r.pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
 initWeakDots();
+renderLeaderboard();
 </script>
 </body>
 </html>
