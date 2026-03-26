@@ -17,10 +17,12 @@ const MIME = {
 
 const server = http.createServer((req, res) => {
   const urlPath = req.url.split('?')[0];
-  const safePath = path.normalize(decodeURIComponent(urlPath)).replace(/^(\.\.[\/\\])+/, '');
-  const filePath = safePath === '/' || safePath === '\\'
+  const decoded = decodeURIComponent(urlPath);
+  // Strip leading slashes/backslashes to get a clean relative filename
+  const relative = decoded.replace(/^[\/\\]+/, '');
+  const filePath = (!relative || relative === '')
     ? HTML_FILE
-    : path.join(__dirname, safePath);
+    : path.join(__dirname, path.normalize(relative).replace(/^(\.\.[\/\\])+/, ''));
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
