@@ -716,10 +716,10 @@ const ls = {
   get : (k, d={})  => { try{return JSON.parse(localStorage.getItem(k))??d}catch{return d} },
   set : (k, v)     => { localStorage.setItem(k, JSON.stringify(v)) },
 };
-const weakKey = (g,e) => `weak_${g}_${e}`;
-const seenKey = (g,e) => `seen_${g}_${e}`;
-const corrKey = (g,e) => `corr_${g}_${e}`;
-const lastKey = (g,e) => `last_${g}_${e}`;
+const weakKey = (g,e,n) => `weak_${n||selName}_${g}_${e}`;
+const seenKey = (g,e,n) => `seen_${n||selName}_${g}_${e}`;
+const corrKey = (g,e,n) => `corr_${n||selName}_${g}_${e}`;
+const lastKey = (g,e,n) => `last_${n||selName}_${g}_${e}`;
 
 function diffScore(en, g, e) {
   if ((ls.get(weakKey(g,e))[en] || 0) > 0) return 4;
@@ -980,6 +980,7 @@ let curType       = null;
 function initWeakDots() {
   document.querySelectorAll('#grade-grid .sel-btn').forEach((btn,i) => {
     const g = i+2;
+    if (!selName) { btn.classList.remove('has-weak'); return; }
     btn.classList.toggle('has-weak',
       ['midterm','final'].some(e => Object.keys(ls.get(weakKey(g,e))).length > 0));
   });
@@ -995,7 +996,9 @@ function selectName(n) {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('selected', n === name);
   });
+  initWeakDots();
   updateWeakBtn();
+  refreshAlert();
   // Close weak panel when switching users
   const wp = document.getElementById('weak-panel');
   if (wp) wp.classList.remove('show');
