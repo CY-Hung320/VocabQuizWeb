@@ -387,6 +387,90 @@ body{
   background:#e0f2f1;border-radius:12px;padding:14px;margin-bottom:6px;
   font-size:.92rem;color:#00695c;line-height:1.6;text-align:left;
 }
+
+/* ── Paper Exam (全範圍模擬考) ── */
+#screen-paper .card{padding:0;overflow:hidden}
+.pe-header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:20px 24px;border-radius:24px 24px 0 0}
+.pe-header h2{font-size:1.1rem;font-weight:800;margin-bottom:2px}
+.pe-header p{font-size:.78rem;opacity:.8}
+.pe-back{background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:5px 12px;font-size:.82rem;cursor:pointer;float:right;margin-top:-2px}
+.pe-body{padding:20px 20px 28px}
+.pe-section{margin-bottom:28px}
+.pe-section-title{font-size:1rem;font-weight:800;color:#3d3d6b;padding-bottom:8px;margin-bottom:14px;border-bottom:2px solid #f0f0f8}
+.pe-part{margin-bottom:20px}
+.pe-part-label{font-size:.85rem;font-weight:800;color:#555;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.pe-part-desc{font-size:.76rem;color:#999;margin-bottom:12px;line-height:1.5}
+/* Section A */
+.lc-item{margin-bottom:14px;padding:12px;background:#f8f8ff;border-radius:12px;border:1.5px solid #e8e8f0;transition:.3s}
+.lc-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.lc-num{font-size:.8rem;font-weight:700;color:#aaa;min-width:18px}
+.lc-speak-btn{background:#667eea;border:none;border-radius:50%;width:30px;height:30px;color:#fff;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lc-opts{display:flex;gap:10px;margin-left:28px}
+.lc-opt{border:2px solid #e8e8f0;background:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;text-align:center;min-width:76px;transition:.15s}
+.lc-opt:hover{border-color:#667eea;background:#f4f4ff}
+.lc-opt.selected{border-color:#667eea;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.lc-opt.correct{border-color:#43e97b!important;background:#e8fdf0!important;color:#1a7a3a!important}
+.lc-opt.wrong{border-color:#ff6b6b!important;background:#fff0f0!important;color:#c0392b!important}
+.lc-opt .opt-emoji{font-size:1.8rem;display:block;margin-bottom:3px}
+.lc-opt .opt-letter{font-size:1.5rem;font-weight:800;display:block;font-family:monospace;color:inherit}
+.lc-opt .opt-word{font-size:.9rem;font-weight:700;color:inherit}
+/* Section B */
+.lw-item{margin-bottom:10px;padding:12px;background:#f8f8ff;border-radius:12px;border:1.5px solid #e8e8f0;transition:.3s}
+.lw-row{display:flex;align-items:center;gap:10px}
+.lw-input{border:none;border-bottom:2px solid #667eea;padding:4px 6px;font-size:1rem;font-weight:700;width:80px;text-align:center;background:transparent;outline:none;color:#3d3d6b}
+.lw-hint{font-size:.7rem;color:#bbb;margin-top:3px;margin-left:58px}
+.lw-item.correct-item{border-color:#43e97b} .lw-item.correct-item .lw-input{border-bottom-color:#43e97b;color:#1a7a3a}
+.lw-item.wrong-item{border-color:#ff6b6b} .lw-item.wrong-item .lw-input{border-bottom-color:#ff6b6b;color:#c0392b}
+/* Section C */
+.lcolor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.lcolor-cell{border:1.5px solid #e8e8f0;border-radius:12px;padding:8px 4px;text-align:center;background:#f8f8ff;transition:.3s}
+.lcolor-emoji{font-size:2rem;display:block;margin-bottom:4px}
+.lcolor-box{width:100%;height:26px;border-radius:6px;border:1.5px dashed #ddd;margin-bottom:5px;transition:background .3s}
+.color-dot{width:16px;height:16px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;transition:.1s}
+.color-dot:hover{transform:scale(1.2);border-color:#555}
+/* Writing A */
+.wa-item{margin-bottom:10px;display:flex;align-items:center;gap:8px;padding:11px 14px;background:#f8f8ff;border-radius:12px;border:1.5px solid #e8e8f0;transition:.3s}
+.wa-label{font-size:.8rem;color:#aaa;min-width:18px}
+.wa-src{font-size:1rem;font-weight:800;color:#3d3d6b;font-family:monospace}
+.wa-arrow{color:#bbb;font-size:.9rem;margin:0 2px}
+.wa-input{border:none;border-bottom:2px solid #667eea;padding:4px 6px;font-size:.95rem;font-weight:700;background:transparent;outline:none;color:#3d3d6b;font-family:monospace;min-width:110px}
+.wa-item.correct-item{border-color:#43e97b} .wa-item.correct-item .wa-input{border-bottom-color:#43e97b;color:#1a7a3a}
+.wa-item.wrong-item{border-color:#ff6b6b} .wa-item.wrong-item .wa-input{border-bottom-color:#ff6b6b;color:#c0392b}
+/* Writing B */
+.wb-item{margin-bottom:12px}
+.wb-eq{display:flex;align-items:center;gap:8px;padding:12px;background:#f8f8ff;border-radius:12px;border:1.5px solid #e8e8f0;flex-wrap:wrap;transition:.3s}
+.wb-box{width:38px;height:38px;border-radius:8px;border:2px solid #e0e0e8;flex-shrink:0}
+.wb-op{font-size:1.2rem;color:#bbb;font-weight:700}
+.wb-write{border:none;border-bottom:2px solid #667eea;padding:4px 6px;font-size:.88rem;font-weight:700;background:transparent;outline:none;color:#3d3d6b;min-width:70px;text-align:center}
+.wb-item.correct-item .wb-eq{border-color:#43e97b} .wb-item.correct-item .wb-write{border-bottom-color:#43e97b;color:#1a7a3a}
+.wb-item.wrong-item .wb-eq{border-color:#ff6b6b} .wb-item.wrong-item .wb-write{border-bottom-color:#ff6b6b;color:#c0392b}
+/* Writing C */
+.wc-item{margin-bottom:12px;padding:12px;background:#f8f8ff;border-radius:12px;border:1.5px solid #e8e8f0;transition:.3s}
+.wc-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.wc-emoji{font-size:2.2rem}
+.wc-choices{display:flex;gap:6px;flex-wrap:wrap}
+.wc-choice{border:2px solid #e8e8f0;background:#fff;border-radius:10px;padding:7px 12px;cursor:pointer;font-size:.85rem;font-weight:600;color:#4a4a6a;transition:.15s;display:flex;align-items:center;gap:5px}
+.wc-choice:hover{border-color:#667eea;background:#f4f4ff}
+.wc-choice.selected{border-color:#667eea;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.wc-choice.correct{border-color:#43e97b!important;background:#e8fdf0!important;color:#1a7a3a!important}
+.wc-choice.wrong{border-color:#ff6b6b!important;background:#fff0f0!important;color:#c0392b!important}
+/* Writing E - word search */
+.ws-target-words{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.ws-word-chip{background:#f0f0ff;border:1.5px solid #c8c8f0;border-radius:20px;padding:3px 11px;font-size:.8rem;font-weight:700;color:#4a4a6a;transition:.2s}
+.ws-word-chip.found{background:#e8fdf0;border-color:#43e97b;color:#1a7a3a;text-decoration:line-through}
+.ws-grid-wrap{overflow-x:auto}
+.ws-row{display:flex;gap:2px;justify-content:flex-start;margin-bottom:2px}
+.ws-cell{width:30px;height:30px;border:1.5px solid #e8e8f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;cursor:pointer;background:#fff;color:#3d3d6b;user-select:none;transition:.1s;flex-shrink:0}
+.ws-cell:hover{border-color:#667eea;background:#f4f4ff}
+.ws-cell.selecting{background:#fff3cd;border-color:#ffc107}
+.ws-cell.found{background:#e8fdf0;border-color:#43e97b;color:#1a7a3a}
+/* Submit + result */
+.pe-submit{width:100%;margin-top:4px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:14px;padding:15px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:.15s}
+.pe-submit:hover{opacity:.9} .pe-submit:disabled{opacity:.5;cursor:not-allowed}
+.pe-result-bar{background:linear-gradient(135deg,#f0f4ff,#f8f0ff);border-radius:14px;padding:16px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.pe-result-name{font-size:.88rem;font-weight:700;color:#666}
+.pe-result-detail{font-size:.75rem;color:#999;margin-top:2px}
+.pe-result-score{font-size:1.5rem;font-weight:800;color:#667eea}
 </style>
 </head>
 <body>
@@ -461,13 +545,17 @@ body{
   <div class="section-label">選擇考試<span></span></div>
   <div class="exam-grid">
     <button class="pick-btn" id="eb-mid" onclick="selectExam('midterm')">
-      <span class="pi">📝</span><span class="pn">期中考</span><div class="ps">上半學期範圍</div>
+      <span class="pi">📝</span><span class="pn">期中聽讀</span><div class="ps">上半學期範圍</div>
     </button>
     <button class="pick-btn" id="eb-fin" onclick="selectExam('final')">
-      <span class="pi">🏁</span><span class="pn">期末考</span><div class="ps">下半學期範圍</div>
+      <span class="pi">🏁</span><span class="pn">期末聽讀</span><div class="ps">下半學期範圍</div>
+    </button>
+    <button class="pick-btn" id="eb-full" onclick="selectExam('full')" style="display:none;grid-column:1/-1">
+      <span class="pi">📋</span><span class="pn">全範圍模擬考</span><div class="ps">聽力＋筆試・仿真考卷</div>
     </button>
   </div>
 
+  <div id="count-section">
   <div class="section-label">選擇題數<span></span></div>
   <div class="count-grid">
     <button class="pick-btn" id="cb-20" onclick="selectCount(20)">
@@ -477,6 +565,7 @@ body{
       <span class="pi">📋</span><span class="pn">40 題</span><div class="ps">閱讀 20・聽力 20</div>
     </button>
   </div>
+  </div><!-- /count-section -->
 
   <div class="alert-bar" id="alert-bar">
     <span>📌</span><span id="alert-txt"></span>
@@ -505,6 +594,13 @@ body{
     </div>
   </div>
 
+  <!-- Paper Exam Leaderboard -->
+  <div class="lb-section" id="pe-lb-section" style="margin-top:10px">
+    <div class="lb-title">📋 模擬考 今日排行</div>
+    <div id="pe-lb-podium" class="lb-podium">
+      <div class="lb-empty">今天還沒有人參加模擬考喦！</div>
+    </div>
+  </div>
   <button class="start-btn" id="start-btn" onclick="startQuiz()">開始考試 →</button>
   </div>
   <button class="start-btn" id="study-btn" onclick="startStudy()" style="display:none">開始背單字 →</button>
@@ -628,6 +724,18 @@ body{
 </div>
 </div>
 
+<!-- PAPER EXAM -->
+<div id="screen-paper" class="screen">
+<div class="card">
+  <div class="pe-header">
+    <button class="pe-back" onclick="goMenu()">← 返回</button>
+    <h2 id="pe-title">2年級 全範圍模擬考</h2>
+    <p>Listening 聽力 ＋ Writing 筆試</p>
+  </div>
+  <div class="pe-body" id="pe-body"></div>
+</div>
+</div>
+
 <script>
 const WORDS = {
   2:{
@@ -711,6 +819,79 @@ const WORDS = {
     ],
   },
 };
+
+// Grade 2 lesson vocabulary (from New_lesson.txt)
+WORDS[2].lesson = [
+  ["food","食物"],["juice","果汁"],["cookie","餅乾"],["milk","牛奶"],
+  ["cake","蛋糕"],["rice","飯"],["pizza","披薩"],["hot dog","熱狗"],
+  ["baby","嬰兒"],["father","爸爸"],["mother","嫟嫟"],
+  ["city","城市"],["bank","銀行"],["hotel","旅館"],["park","公園"],
+  ["sea","海洋"],["lake","湖泊"],["road","路"],["tree","樹"],
+  ["cup","杯子"],["dish","盤子"],["fork","叉子"],["desk","書桌"],
+  ["card","卡片"],["bag","袋子"],["gift","禮物"],["kite","風箏"],["book","書"],
+  ["body","身體"],["face","臉"],["arm","手臂"],["shoe","鞋子"],["coat","大衣"],
+  ["how","如何"],["what","什麼"],["why","為什麼"],["fan","電風扇"],
+  ["name","名字"],["song","歌曲"],
+  ["hot","熱的"],["cold","冷的"],["sad","悟傷的"],["happy","快樂的"],
+  ["sorry","抱歉的"],["lazy","懶惰的"],["shy","害羞的"],["sick","生病的"],
+  ["lucky","幸運的"],["cute","可愛的"],["safe","安全的"],["new","新的"],
+  ["old","舊的"],["dry","乾燥的"],["short","短的"],["fast","快的"],["late","遲到"],
+  ["cook","煮"],["feel","感覺"],["cry","哭泣"],["see","看"],["wash","清洗"],
+  ["play","玩"],["sing","唱歌"],["swim","游泳"],["jog","慢跑"],["run","跑"],
+  ["kick","踢"],["open","打開"],["like","喜歡"],["come","來"],["go","去"],
+  ["eat","吃"],["drink","喝"],["ant","蟞蟻"],["goat","山羊"],["elf","精靈"],
+];
+
+// Grade 4 lesson vocabulary (from New_lesson.txt)
+WORDS[4].lesson = [
+  ["agree","同意"],["airplane","飛機"],["answer","答案"],["bakery","麵包店"],
+  ["beach","海灘"],["beef","牛肉"],["belt","腰帶"],["bite","咋"],["blind","矎的"],
+  ["boat","船"],["boss","老闆"],["brother","兄弟"],["brush","刷子"],["busy","忙碌"],
+  ["butter","奶油"],["buy","買"],["chalk","粉筆"],["cheap","便宜的"],["cheese","乳酪"],
+  ["church","教堂"],["circle","圓圈"],["classmate","同學"],["classroom","教室"],
+  ["climb","爬"],["coffee","咏啡"],["copy","影印"],["count","數數"],["crazy","飢狂的"],
+  ["dance","跳舞"],["dark","黑暗的"],["dinner","晚餐"],["dirty","髅髃"],
+  ["doctor","醫生"],["dollar","元"],["dream","夢想"],["dress","洋裝"],
+  ["driver","司機"],["eraser","橡皮擦"],["evening","傍晚"],["family","家庭"],
+  ["farmer","農夫"],["finger","手指"],["flower","花"],["friend","朋友"],
+  ["fruit","水果"],["garden","花園"],["glass","玻璃杯"],["glove","手套"],
+  ["goodbye","再見"],["grandma","祖母"],["grandpa","祖父"],["grass","草"],
+  ["great","很棒"],["guess","猜"],["habit","習慣"],["help","幫助"],
+  ["history","歷史"],["holiday","假日"],["homework","家庭作業"],["hungry","颢餓的"],
+  ["hurt","受傷"],["jacket","夾克"],["jeans","牛仔錯"],["kitchen","廢房"],
+  ["knee","膝蓋"],["knife","刀子"],["lonely","孤獨的"],["lunch","午餐"],
+  ["marker","麥克筆"],["math","數學"],["menu","菜單"],["morning","早上"],
+  ["mouse","老鼠"],["movie","電影"],["museum","博物館"],["music","音樂"],
+  ["neck","頸部"],["night","夜晴"],["noodles","麵條"],["nurse","護士"],
+  ["office","辦公室"],["orange","柳橙"],["page","頁"],["pants","錯子"],
+  ["pet","寵物"],["piano","龋琴"],["picnic","野餐"],["please","請"],
+  ["popcorn","爆米花"],["pork","豬肉"],["pull","拉"],["push","推"],
+  ["quick","快速的"],["quiet","安靜的"],["quiz","小考"],["radio","收音機"],
+  ["rainbow","彩虹"],["read","讀"],["restroom","廁所"],["river","河流"],
+  ["salad","沙拉"],["salty","鹹的"],["sandwich","三明治"],["season","季節"],
+  ["shape","形狀"],["share","分享"],["sheep","綿羊"],["ship","船"],
+  ["shirt","襯衫"],["shop","商店"],["sleep","睡覺"],["smell","聞"],
+  ["snake","蛇"],["speak","說話"],["spoon","湯匙"],["spring","春天"],
+  ["story","故事"],["street","街道"],["sugar","糖"],["summer","夏天"],
+  ["sweater","毛衣"],["thirsty","口渴的"],["tired","疲倦的"],["truck","貨車"],
+  ["walk","走路"],["want","想要"],["watch","看"],["week","星期"],
+  ["windy","多風的"],["winter","冬天"],["write","寫"],["young","年輕的"],
+  ["angry","生氣"],["banana","香蕉"],["baseball","棒球"],["basketball","籃球"],
+  ["bathroom","浴室"],["bedroom","臥室"],["birthday","生日"],["bookstore","書店"],
+  ["breakfast","早餐"],["candy","糖果"],["chicken","雞肉"],["clean","乾淨的"],
+  ["clothes","衣服"],["cloudy","多雲"],["cool","涼的"],["date","日期"],
+  ["dozen","一打"],["English","英文"],["habit","習慣"],["horse","馬"],
+  ["ice cream","冰淨淋"],["juice","果汁"],["lazy","懶惰的"],["left","左邊"],
+  ["lion","獅子"],["lucky","幸運的"],["milk","牛奶"],["monkey","猴子"],
+  ["mouth","嘴巴"],["north","北方"],["pizza","披薩"],["rabbit","兔子"],
+  ["right","右邊"],["road","路"],["sad","悟傷的"],["safe","安全的"],
+  ["school","學校"],["sea","海洋"],["slow","慢的"],["some","一些"],
+  ["sorry","難過的"],["south","南方"],["sure","確定的"],["thirsty","口渴的"],
+  ["tiger","老虎"],["today","今天"],["tree","樹"],["water","水"],
+  ["white","白色"],["yellow","黃色"],["food","食物"],["rice","飯"],
+  ["cake","蛋糕"],["city","城市"],["bank","銀行"],["hotel","旅館"],["park","公園"],
+  ["lake","湖泊"],["sea","海洋"],["three","三"],["twelve","十二"],
+];
 
 const ls = {
   get : (k, d={})  => { try{return JSON.parse(localStorage.getItem(k))??d}catch{return d} },
@@ -1007,12 +1188,21 @@ function selectName(n) {
 function selectGrade(g) {
   selGrade = g;
   document.querySelectorAll('#grade-grid .sel-btn').forEach((b,i)=>b.classList.toggle('selected',i+2===g));
+  const fb = document.getElementById('eb-full');
+  fb.style.display = g === 2 ? 'block' : 'none';
+  if (g !== 2 && selExam === 'full') {
+    selExam = null; fb.classList.remove('selected');
+    document.getElementById('count-section').style.display = '';
+  }
   refreshAlert(); checkReady();
 }
 function selectExam(e) {
   selExam = e;
   document.getElementById('eb-mid').classList.toggle('selected', e==='midterm');
   document.getElementById('eb-fin').classList.toggle('selected', e==='final');
+  document.getElementById('eb-full').classList.toggle('selected', e==='full');
+  document.getElementById('count-section').style.display = e === 'full' ? 'none' : '';
+  if (e === 'full') selCount = null;
   refreshAlert(); checkReady();
 }
 function selectCount(n) {
@@ -1046,9 +1236,10 @@ function selectMode(m) {
   checkReady();
 }
 function checkReady() {
-  const quizReady = selName!==null && selGrade!==null && selExam!==null && selCount!==null;
+  const fullReady = selName!==null && selGrade===2 && selExam==='full';
+  const quizReady = selName!==null && selGrade!==null && selExam!==null && selExam!=='full' && selCount!==null;
   const studyReady = selName!==null && selGrade!==null;
-  document.getElementById('start-btn').classList.toggle('ready', quizReady);
+  document.getElementById('start-btn').classList.toggle('ready', quizReady || fullReady);
   const sb = document.getElementById('study-btn');
   sb.classList.toggle('ready', studyReady);
   sb.style.opacity = studyReady ? '1' : '.3';
@@ -1186,6 +1377,7 @@ function handleTimeout() {
 }
 
 function startQuiz() {
+  if (selExam === 'full') { startPaperExam(); return; }
   questions = buildQuestions(selGrade, selExam, selCount);
   totalQ = questions.length;
   qIdx = 0; score = 0;
@@ -1505,14 +1697,15 @@ function getEncouragement(name, pct) {
 
 function hidePhoto() {}
 function goMenu() {
-  stopConfetti(); hidePhoto();
-  selMode = null;
+  stopConfetti(); hidePhoto(); clearPeCD();
+  selMode = null; wsSelStart = null;
+  lc2PlayTimers.forEach(clearTimeout); lc2PlayTimers = [];
   document.getElementById('mode-study').classList.remove('selected');
   document.getElementById('mode-quiz').classList.remove('selected');
   document.getElementById('quiz-options').classList.remove('show');
   document.getElementById('study-btn').style.display = 'none';
   document.getElementById('start-btn').style.display = 'block';
-  showScreen('screen-menu'); 
+  showScreen('screen-menu');
 // ═══════════════════════════════════════════
 //  PRACTICE HISTORY (10-year retention)
 // ═══════════════════════════════════════════
@@ -1577,6 +1770,36 @@ function formatSecs(s) {
   const sec = s % 60;
   return m > 0 ? `${m}分${sec}秒` : `${sec}秒`;
 }
+function renderPeLeaderboard() {
+  const today = new Date().toISOString().slice(0, 10);
+  const data = JSON.parse(localStorage.getItem('pe_daily_' + today) || '[]');
+  const podium = document.getElementById('pe-lb-podium');
+  if (!podium) return;
+  if (data.length === 0) {
+    podium.innerHTML = '<div class="lb-empty">今天還沒有人參加模擬考喦！</div>';
+    return;
+  }
+  const avatarMap = {'嘉駿(Jackson)':'🦁','振凱(Max)':'🐯','煊煊':'🐻','芳芳':'🐰','軒寶':'🐨','恆恆':'🦅'};
+  const medals = ['🥇','🥈','🥉'];
+  const diffLabels = ['初級','進階','高手'];
+  podium.innerHTML = data.map((e,i) => {
+    const avatar = avatarMap[e.name] || '😊';
+    const name = (e.name||'').replace(/\(.*\)/,'');
+    const dl = diffLabels[e.diff||0]||'初級';
+    return `<div class="lb-row ${i<3?'rank-'+(i+1):'rank-other'}">
+      <span class="lb-rank">${i<3?medals[i]:i+1}</span>
+      <div class="lb-info">
+        <div class="lb-name">${avatar} ${name}</div>
+        <div class="lb-detail">模擬考 ・ ${dl}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="lb-score-val">${e.score}分</div>
+        <div class="lb-pct">${e.secs}秒</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderLeaderboard(targetId) {
   const todayRecs = getTodayRecords();
   const countEl = document.getElementById('lb-today-count');
@@ -1747,6 +1970,7 @@ function renderWeakPanel() {
 
 initWeakDots();
 updateWeakBtn();
+renderPeLeaderboard();
 renderLeaderboard('lb-podium'); refreshAlert();
 }
 function retryQuiz() { stopConfetti(); hidePhoto(); startQuiz(); }
@@ -2033,6 +2257,563 @@ function renderWeakPanel() {
 initWeakDots();
 renderLeaderboard('lb-podium');
 updateWeakBtn();
+
+// ═══════════════════════════════════════════
+//  PAPER EXAM - Grade 2 全範圍模擬考  (one-question-at-a-time)
+// ═══════════════════════════════════════════
+
+const PE_LC_POOL = [
+  {play:'cat',    opts:['cat','duck','frog','dog'],      ci:0, oType:'emoji'},
+  {play:'duck',   opts:['frog','duck','cat','fish'],     ci:1, oType:'emoji'},
+  {play:'frog',   opts:['bird','dog','frog','rabbit'],   ci:2, oType:'emoji'},
+  {play:'bird',   opts:['bird','fish','cat','duck'],     ci:0, oType:'emoji'},
+  {play:'rabbit', opts:['rabbit','bear','pig','cat'],    ci:0, oType:'emoji'},
+  {play:'pig',    opts:['chicken','pig','frog','dog'],   ci:1, oType:'emoji'},
+  {play:'red',    opts:['red','blue','green','yellow'],  ci:0, oType:'emoji'},
+  {play:'green',  opts:['yellow','green','red','blue'],  ci:1, oType:'emoji'},
+  {play:'p',      opts:['p','q','b','d'],                ci:0, oType:'letter'},
+  {play:'b',      opts:['d','b','p','q'],                ci:1, oType:'letter'},
+  {play:'n',      opts:['m','n','u','h'],                ci:1, oType:'letter'},
+  {play:'bird',   opts:['girl','bird','word','third'],   ci:1, oType:'word'},
+  {play:'cat',    opts:['cat','hat','bat','rat'],        ci:0, oType:'word'},
+  {play:'duck',   opts:['duck','luck','buck','muck'],    ci:0, oType:'word'},
+  {play:'fish',   opts:['dish','fish','wish','rich'],    ci:1, oType:'word'},
+];
+
+const PE_COLOR_EQS = [
+  {c1:'red',   c2:'yellow', result:'orange'},
+  {c1:'blue',  c2:'yellow', result:'green'},
+  {c1:'red',   c2:'blue',   result:'purple'},
+  {c1:'red',   c2:'white',  result:'pink'},
+  {c1:'black', c2:'white',  result:'gray'},
+];
+
+const PE_COLOR_HEX = {
+  red:'#ff4444', blue:'#4488ff', yellow:'#ffdd00', green:'#44bb44',
+  orange:'#ff8800', purple:'#8844cc', pink:'#ff88bb',
+  white:'#f0f0f0', black:'#333', gray:'#aaa', brown:'#8b5e3c'
+};
+
+let peState = null;
+let wsSelStart = null;
+let lc2PlayTimers = [];
+let peCDTimer = null;
+
+function startPaperExam() {
+  clearPeCD();
+  lc2PlayTimers.forEach(clearTimeout); lc2PlayTimers = [];
+  wsSelStart = null;
+  peState = buildPaperExam();
+  document.getElementById('pe-title').textContent = `${selName} \u2013 2\u5e74\u7d4a\u5168\u7bc4\u570d\u6a21\u64ec\u8003`;
+  showScreen('screen-paper');
+  renderPeIntro();
+}
+
+function renderPeIntro() {
+  document.getElementById('pe-body').innerHTML = `
+    <div style="text-align:center;padding:16px 8px">
+      <div style="font-size:3rem;margin-bottom:10px">\u{1f4cb}</div>
+      <h3 style="font-size:1.05rem;font-weight:800;color:#3d3d6b;margin-bottom:6px">2\u5e74\u7d4a \u5168\u7bc4\u570d\u6a21\u64ec\u8003</h3>
+      <div style="display:inline-block;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:20px;padding:3px 14px;font-size:.75rem;font-weight:700;margin-bottom:6px">${PE_DIFF_LABELS[peDiff()]}</div>
+      <p style="font-size:.78rem;color:#999;line-height:1.9;margin-bottom:16px">
+        <b style="color:#667eea">Part 1 &middot; Listening \u807d\u529b</b><br>
+        A. Listen and circle\uff085\u984c\uff09<br>
+        B. Listen and write\uff085\u984c\uff09<br>
+        C. Listen and number\uff084\u984c\uff09<br><br>
+        <b style="color:#764ba2">Part 2 &middot; Writing \u7b46\u8a66</b><br>
+        A. Read and write\uff085\u984c\uff09&middot; B. Color and write\uff084\u984c\uff09<br>
+        C. Read and check\uff085\u984c\uff09&middot; E. Fill in the blank\uff0810\u984c\uff09
+      </p>
+      <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:10px 14px;font-size:.78rem;color:#795548;margin-bottom:20px;text-align:left;line-height:1.8">
+        \u23f1\ufe0f \u807d\u529b\u6bcf\u984c <b>10 \u79d2</b>\u5012\u6578\uff0c\u8d85\u6642\u81ea\u52d5\u5931\u6557<br>
+        \u{1f4dd} \u7b46\u8a66\u90e8\u5206\u4e0d\u9650\u6642\uff0c\u4ed4\u7d30\u4f5c\u7b54
+      </div>
+      <button onclick="peBegin()" style="width:100%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:14px;padding:15px;font-size:1.05rem;font-weight:700;cursor:pointer">
+        \u958b\u59cb\u8003\u8a66 \u2192
+      </button>
+    </div>`;
+}
+
+function peBegin() { peState.startTime = Date.now(); renderPeQuestion(); }
+
+function startPeCD(secs, onExpire) {
+  clearPeCD();
+  let rem = secs;
+  updatePeCDBar(rem, secs);
+  peCDTimer = setInterval(() => {
+    rem--;
+    updatePeCDBar(rem, secs);
+    if (rem <= 0) { clearPeCD(); onExpire(); }
+  }, 1000);
+}
+function clearPeCD() { if (peCDTimer) { clearInterval(peCDTimer); peCDTimer = null; } }
+function updatePeCDBar(rem, total) {
+  const bar = document.getElementById('pe-cd-bar');
+  const num = document.getElementById('pe-cd-num');
+  if (bar) { bar.style.width = `${Math.max(0,(rem/total)*100)}%`; bar.style.background = rem<=3?'#ff6b6b':'linear-gradient(90deg,#43e97b,#38f9d7)'; }
+  if (num) num.textContent = rem;
+}
+function enablePeNext() {
+  const b = document.getElementById('pe-next-btn');
+  if (b) { b.style.opacity='1'; b.style.pointerEvents='auto'; }
+}
+
+function peWeakKey() { return `pe_weak_${selName}`; }
+function recordPeWrong(wk) {
+  if (!wk) return;
+  const data = JSON.parse(localStorage.getItem(peWeakKey()) || '{}');
+  data[wk] = (data[wk] || 0) + 1;
+  localStorage.setItem(peWeakKey(), JSON.stringify(data));
+}
+
+// ── Paper Exam Difficulty ──
+function peDiff() {
+  return Math.min(2, parseInt(localStorage.getItem('pe_diff_' + selName) || '0'));
+}
+const PE_DIFF_LABELS = ['初級 ★☆☆','進階 ★★☆','高手 ★★★'];
+const PE_CONFUSE_LETTERS = {
+  b:['d','p','q'], d:['b','p','q'], p:['b','d','q'], q:['b','d','p'],
+  m:['n','w','u'], n:['m','h','u'], h:['b','n','k'],
+  i:['j','l','y'], l:['i','r','j'], j:['i','g','y'],
+  a:['e','o','u'], e:['a','i','o'], o:['a','e','u'], u:['a','e','o'],
+  v:['w','u','y'], w:['v','m','n'], c:['e','o','g'], g:['q','c','j'],
+  s:['z','c','x'], z:['s','x','c'], f:['t','v','r'], t:['f','l','r'],
+};
+function peCzDistractors(correct, diff) {
+  const conf = PE_CONFUSE_LETTERS[correct] || [];
+  const others = 'abcdefghijklmnopqrstuvwxyz'.split('').filter(c => c !== correct);
+  if (diff === 0) return shuffle(others).slice(0, 3);
+  if (diff === 1) return shuffle([...conf, ...others.filter(c => !conf.includes(c))]).slice(0, 3);
+  // diff 2: prioritize confusing letters, fill rest with adjacent alphabet
+  const adj = others.filter(c => Math.abs(c.charCodeAt(0) - correct.charCodeAt(0)) <= 3);
+  return shuffle([...new Set([...conf, ...adj, ...others])]).slice(0, 3);
+}
+function peWordDistractors(correct, pool, diff) {
+  const others = pool.filter(w => w[0] !== correct && /^[a-zA-Z]/.test(w[0]));
+  if (diff === 0) return shuffle(others).slice(0, 3);
+  const sameLen = others.filter(w => w[0].length === correct.length);
+  if (diff === 1) return [...shuffle(sameLen), ...shuffle(others)].filter((v,i,a) => a.findIndex(x=>x[0]===v[0])===i).slice(0, 3);
+  const oneOff = sameLen.filter(w => {
+    if (w[0].length !== correct.length) return false;
+    let d = 0;
+    for (let i = 0; i < correct.length; i++) if (correct[i] !== w[0][i]) d++;
+    return d === 1;
+  });
+  return [...shuffle(oneOff), ...shuffle(sameLen), ...shuffle(others)].filter((v,i,a) => a.findIndex(x=>x[0]===v[0])===i).slice(0, 3);
+}
+
+function buildPaperExam() {
+  const rawAll = [...WORDS[2].midterm, ...WORDS[2].final, ...(WORDS[2].lesson||[])];
+  const all = [...new Map(rawAll.map(w => [w[0], w])).values()];
+  const withEmoji = all.filter(w => EMOJI_MAP[w[0]]);
+  const animals = [...WORDS[2].final, ...(WORDS[2].lesson||[])].filter(w => EMOJI_MAP[w[0]]);
+  const qs = [];
+  const diff = peDiff();
+
+  // Part 1A: Listen and circle (5)
+  shuffle([...PE_LC_POOL]).slice(0, 5).forEach(q => qs.push({
+    type:'lc', part:'1', section:'A. Listen and circle',
+    instr:'仔細聽，選出正確的答案',
+    play:q.play, opts:q.opts, oType:q.oType, ci:q.ci, ans:-1, cdSecs:10, wk:q.play
+  }));
+
+  // Part 1B: Listen and write (5) — difficulty-aware letter distractors
+  shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')).slice(0, 5).forEach(lt => {
+    const wrongs = peCzDistractors(lt.toLowerCase(), diff).map(c => c.toUpperCase());
+    const opts = shuffle([lt, ...wrongs]);
+    qs.push({
+      type:'lb', part:'1', section:'B. Listen and write',
+      instr:'仔細聽，選出聽到的字母',
+      letter:lt, opts, ci:opts.indexOf(lt), ans:-1, cdSecs:10, wk:lt
+    });
+  });
+
+  // Part 1C: Listen and number (4 questions)
+  const lcAnimals = shuffle(animals).slice(0, 4);
+  const lcPlayOrder = shuffle([0,1,2,3]);
+  [0,1,2,3].forEach(pos => {
+    const correctAnimalIdx = lcPlayOrder[pos];
+    const correctAnimal = lcAnimals[correctAnimalIdx];
+    const wrongAnimals = lcAnimals.filter((_, i) => i !== correctAnimalIdx);
+    const opts = shuffle([correctAnimal, ...wrongAnimals]);
+    qs.push({
+      type:'lc2', part:'1', section:'C. Listen, write and color',
+      instr:`仔細聽動物的順序，第 ${pos+1} 個嘱到的是哪個動物？`,
+      lcAnimals, lcPlayOrder, position:pos+1,
+      opts, ci:opts.indexOf(correctAnimal), ans:-1, cdSecs:10, wk:correctAnimal[0]
+    });
+  });
+
+  // Part 2A: Case conversion (5)
+  shuffle(all.filter(w => /^[a-z]+$/.test(w[0]))).slice(0, 5).forEach((w, i) => {
+    const isUpper = i < 2;
+    const src = isUpper ? w[0] : w[0].toUpperCase();
+    const answer = isUpper ? w[0].toUpperCase() : w[0];
+    const wrongWords = peWordDistractors(w[0], all, diff).map(x => isUpper ? x[0].toUpperCase() : x[0]);
+    const opts = shuffle([answer, ...wrongWords]);
+    qs.push({
+      type:'wa', part:'2', section:'A. Read and write',
+      instr:'讀一讀，選出正確的大小寫轉換',
+      src, answer, opts, ci:opts.indexOf(answer), ans:-1, cdSecs:0, wk:w[0]
+    });
+  });
+
+  // Part 2B: Color equations (4)
+  const allColors = Object.keys(PE_COLOR_HEX);
+  const colorGroups = {warm:['red','orange','yellow','pink'],cool:['blue','green','purple'],neutral:['black','white','gray','brown']};
+  shuffle(PE_COLOR_EQS).slice(0, 4).forEach(eq => {
+    let wrongColors;
+    if (diff >= 1) {
+      const grp = Object.values(colorGroups).find(g => g.includes(eq.result)) || allColors;
+      wrongColors = [...shuffle(grp.filter(c=>c!==eq.result)), ...shuffle(allColors.filter(c=>c!==eq.result&&!grp.includes(c)))].slice(0,3);
+    } else {
+      wrongColors = shuffle(allColors.filter(c => c !== eq.result)).slice(0, 3);
+    }
+    const opts = shuffle([eq.result, ...wrongColors]);
+    qs.push({
+      type:'wb', part:'2', section:'B. Read, color and write',
+      instr:'讀一讀，選出兩個顏色混合後的結果',
+      c1:eq.c1, c2:eq.c2, result:eq.result, opts, ci:opts.indexOf(eq.result), ans:-1, cdSecs:0, wk:eq.result
+    });
+  });
+
+  // Part 2C: Read and check (5)
+  shuffle(withEmoji).slice(0, 5).forEach(w => {
+    const wrongs = peWordDistractors(w[0], all, diff);
+    const opts = shuffle([w, ...wrongs]);
+    qs.push({
+      type:'wc', part:'2', section:'C. Read and check',
+      instr:'看圖片，選出正確的單字',
+      word:w, opts, ci:opts.indexOf(w), ans:-1, cdSecs:0, wk:w[0]
+    });
+  });
+
+  // Part 2E: Cloze – 10 questions
+  const czPool = shuffle(all.filter(w => w[0].length>=2 && /^[a-z]+$/.test(w[0])));
+  czPool.slice(0, 10).forEach(czWord => {
+    const czIdx = Math.floor(Math.random() * czWord[0].length);
+    const czCorrect = czWord[0][czIdx];
+    const czWrongs = peCzDistractors(czCorrect, diff);
+    const czOpts = shuffle([czCorrect, ...czWrongs]);
+    qs.push({
+      type:'cz', part:'2', section:'E. Fill in the blank',
+      instr:'看一看，選出遺漏的字母補全單字',
+      word:czWord, letterIdx:czIdx, opts:czOpts, ci:czOpts.indexOf(czCorrect), ans:-1, cdSecs:0, wk:czWord[0]
+    });
+  });
+
+  return { qs, idx:0 };
+}
+
+function renderPeQuestion() {
+  clearPeCD();
+  lc2PlayTimers.forEach(clearTimeout); lc2PlayTimers = [];
+  wsSelStart = null;
+  const s = peState;
+  const q = s.qs[s.idx];
+  const total = s.qs.length;
+  const isLast = s.idx === total - 1;
+  const progPct = (s.idx / total) * 100;
+  const partLabel = q.part==='1' ? 'Part 1 \u00b7 Listening \u807d\u529b' : 'Part 2 \u00b7 Writing \u7b46\u8a66';
+
+  const cdHtml = q.cdSecs > 0 ? `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#bbb;margin-bottom:3px">
+        <span>\u23f1\ufe0f \u5012\u6578\u8a08\u6642</span><span id="pe-cd-num">${q.cdSecs}</span>
+      </div>
+      <div style="background:#f0f0f0;border-radius:20px;height:6px;overflow:hidden">
+        <div id="pe-cd-bar" style="height:100%;background:linear-gradient(90deg,#43e97b,#38f9d7);border-radius:20px;width:100%;transition:width .9s linear"></div>
+      </div>
+    </div>` : '';
+
+  let qContent = '';
+  if (q.type==='lc') {
+    qContent = `
+            <div class="lc-opts" style="justify-content:center;flex-wrap:wrap;gap:10px">
+        ${q.opts.map((opt,j)=>`
+        <button class="lc-opt" id="pe-opt-${j}" onclick="peOptSelect(${j})">
+          ${q.oType==='emoji'?`<span class="opt-emoji">${EMOJI_MAP[opt]||'\u2753'}</span><span class="opt-word">${opt}</span>`
+           :q.oType==='letter'?`<span class="opt-letter">${opt.toUpperCase()}${opt}</span>`
+           :`<span class="opt-word" style="font-size:1.1rem;font-weight:800">${opt}</span>`}
+        </button>`).join('')}
+      </div>`;
+  } else if (q.type==='lb') {
+    qContent = `
+            <div class="lc-opts" style="justify-content:center;flex-wrap:wrap;gap:10px">
+        ${q.opts.map((opt,j)=>`
+        <button class="lc-opt" id="pe-opt-${j}" onclick="peOptSelect(${j})">
+          <span style="font-size:1.4rem;font-weight:800;font-family:monospace">${opt}${opt.toLowerCase()}</span>
+        </button>`).join('')}
+      </div>`;
+  } else if (q.type==='lc2') {
+    qContent = `
+            <div class="lc-opts" style="justify-content:center;flex-wrap:wrap;gap:10px">
+        ${q.opts.map((opt,j)=>`
+        <button class="lc-opt" id="pe-opt-${j}" onclick="peOptSelect(${j})">
+          <span class="opt-emoji">${EMOJI_MAP[opt[0]]||'\u2753'}</span>
+          <span class="opt-word">${opt[1]||opt[0]}</span>
+        </button>`).join('')}
+      </div>`;
+  } else if (q.type==='wa') {
+    qContent = `
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:1.8rem;font-weight:800;color:#3d3d6b;font-family:monospace;margin-bottom:6px">${q.src} \u2192 ?</div>
+        <div style="font-size:.7rem;color:#bbb">\u8acb\u9078\u51fa\u6b63\u78ba\u7684\u5927\u5c0f\u5beb\u8f49\u63db</div>
+      </div>
+      <div class="lc-opts" style="justify-content:center;flex-wrap:wrap;gap:10px">
+        ${q.opts.map((opt,j)=>`
+        <button class="lc-opt" id="pe-opt-${j}" onclick="peOptSelect(${j})" style="font-family:monospace;font-size:1.1rem;font-weight:800">
+          ${opt}
+        </button>`).join('')}
+      </div>`;
+  } else if (q.type==='wb') {
+    qContent = `
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;flex-wrap:wrap;margin-bottom:12px">
+        <div style="width:44px;height:44px;border-radius:10px;border:2px solid #e0e0e8;background:${PE_COLOR_HEX[q.c1]}"></div>
+        <span style="font-size:1.3rem;color:#bbb;font-weight:700">+</span>
+        <div style="width:44px;height:44px;border-radius:10px;border:2px solid #e0e0e8;background:${PE_COLOR_HEX[q.c2]}"></div>
+        <span style="font-size:1.3rem;color:#bbb;font-weight:700">=</span>
+        <div style="font-size:1.5rem">\u2753</div>
+      </div>
+      <div class="lc-opts" style="justify-content:center;flex-wrap:wrap;gap:10px">
+        ${q.opts.map((opt,j)=>`
+        <button class="lc-opt" id="pe-opt-${j}" onclick="peOptSelect(${j})" style="display:flex;align-items:center;gap:6px;padding:8px 16px">
+          <div style="width:22px;height:22px;border-radius:5px;background:${PE_COLOR_HEX[opt]||'#ccc'};flex-shrink:0;border:1px solid #ddd"></div>
+          <span style="font-size:.9rem;font-weight:700">${opt}</span>
+        </button>`).join('')}
+      </div>`;
+  } else if (q.type==='wc') {
+    qContent = `
+      <div style="text-align:center;margin-bottom:14px">
+        <span style="font-size:4rem">${EMOJI_MAP[q.word[0]]||'\u2753'}</span>
+      </div>
+      <div class="lc-opts" style="justify-content:center;flex-wrap:wrap;gap:10px">
+        ${q.opts.map((ch,j)=>`
+        <button class="lc-opt" id="pe-opt-${j}" onclick="peOptSelect(${j})">
+          <span class="opt-word">${ch[0]}</span>
+        </button>`).join('')}
+      </div>`;
+  } else if (q.type==='cz') {
+    const czMasked = q.word[0].split('').map((c,i) =>
+      i===q.letterIdx
+        ? '<span style="display:inline-block;min-width:1em;border-bottom:3px solid #667eea;color:#667eea;font-weight:900">_</span>'
+        : c
+    ).join('');
+    qContent = `
+      <div style="text-align:center;margin-bottom:20px">
+        ${EMOJI_MAP[q.word[0]] ? `<div style="font-size:3.5rem;margin-bottom:10px">${EMOJI_MAP[q.word[0]]}</div>` : ''}
+        <div style="font-size:2rem;font-weight:800;font-family:monospace;letter-spacing:4px;color:#3d3d6b">${czMasked}</div>
+        <div style="font-size:.75rem;color:#aaa;margin-top:6px">${q.word[1]||''}</div>
+      </div>
+      <div class="lc-opts" style="justify-content:center;flex-wrap:wrap;gap:14px">
+        ${q.opts.map((opt,j)=>`
+        <button class="lc-opt" id="pe-opt-${j}" onclick="peOptSelect(${j})"
+          style="font-family:monospace;font-size:1.5rem;font-weight:900;min-width:64px">
+          ${opt}
+        </button>`).join('')}
+      </div>`;
+  }
+
+  document.getElementById('pe-body').innerHTML = `
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#bbb;margin-bottom:4px">
+        <span>${partLabel} \u00b7 ${q.section}</span>
+        <span>${s.idx+1} / ${total}</span>
+      </div>
+      <div style="background:#f0f0f0;border-radius:20px;height:5px;overflow:hidden">
+        <div style="height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:20px;width:${progPct}%;transition:width .4s"></div>
+      </div>
+    </div>
+    ${cdHtml}
+    <div style="background:#e8f4fd;border-left:4px solid #667eea;border-radius:0 8px 8px 0;padding:8px 12px;font-size:.78rem;color:#3d3d6b;margin-bottom:10px;line-height:1.5">
+      \u{1f4cc} ${q.instr}
+    </div>
+    <div id="pe-q-box" style="background:#f8f8ff;border-radius:16px;padding:20px;margin-bottom:14px;border:1.5px solid #e8e8f0;min-height:150px;transition:border-color .3s">
+      ${qContent}
+    </div>
+    <button id="pe-next-btn" onclick="peNext()"
+      style="width:100%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:12px;padding:13px;font-size:1rem;font-weight:700;cursor:pointer;opacity:.35;pointer-events:none;transition:opacity .2s">
+      ${isLast ? '\u5b8c\u6210\u8003\u8a66 \u2713' : '\u4e0b\u4e00\u984c \u2192'}
+    </button>`;
+
+  if (q.type==='ws') enablePeNext();
+
+  if (q.type==='lc') {
+    setTimeout(()=>speak(q.play,1), 300);
+    startPeCD(q.cdSecs, ()=>peTimeout());
+  } else if (q.type==='lb') {
+    setTimeout(()=>speak(q.letter,1), 300);
+    startPeCD(q.cdSecs, ()=>peTimeout());
+  } else if (q.type==='lc2') {
+    setTimeout(()=>pePlayLC2(), 600);
+    startPeCD(q.cdSecs, ()=>peTimeout());
+  }
+}
+
+function peNext() {
+  clearPeCD();
+  lc2PlayTimers.forEach(clearTimeout); lc2PlayTimers = [];
+  const s = peState;
+  if (s.idx >= s.qs.length - 1) { pePaperFinish(); return; }
+  s.idx++;
+  renderPeQuestion();
+}
+
+function peOptSelect(j) {
+  const q = peState.qs[peState.idx];
+  if (q.ans !== -1) return;
+  clearPeCD();
+  q.ans = j;
+  const ok = (j === q.ci);
+  const count = q.opts ? q.opts.length : 4;
+  for (let jj=0; jj<count; jj++) {
+    const b = document.getElementById(`pe-opt-${jj}`);
+    if (!b) continue;
+    b.onclick = null;
+    if (jj === j)          b.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok && jj===q.ci)  b.classList.add('correct');
+  }
+  const box = document.getElementById('pe-q-box');
+  if (box) box.style.borderColor = ok ? '#43e97b' : '#ff6b6b';
+  if (!ok && q.wk) recordPeWrong(q.wk);
+  enablePeNext();
+}
+
+function peTimeout() {
+  const q = peState.qs[peState.idx];
+  if (q.ans !== -1) return;
+  q.ans = -2;
+  if (q.wk) recordPeWrong(q.wk);
+  const cb = document.getElementById(`pe-opt-${q.ci}`);
+  if (cb) cb.classList.add('correct');
+  const box = document.getElementById('pe-q-box');
+  if (box) box.style.borderColor = '#ff6b6b';
+  enablePeNext();
+  setTimeout(()=>peNext(), 1500);
+}
+
+function pePlayLC2() {
+  lc2PlayTimers.forEach(clearTimeout); lc2PlayTimers = [];
+  const q = peState.qs[peState.idx];
+  q.lcPlayOrder.forEach((animalIdx, pos) => {
+    lc2PlayTimers.push(setTimeout(()=>speak(q.lcAnimals[animalIdx][0], 1), pos*2200));
+  });
+}
+
+
+function pePaperFinish() {
+  clearPeCD();
+  lc2PlayTimers.forEach(clearTimeout); lc2PlayTimers = [];
+  let correct=0, total=0;
+  const wrongList = [];
+
+  peState.qs.forEach(q => {
+    let isCorrect = false;
+    let qLabel = '', ansLabel = '';
+    if (q.type==='lc') {
+      total++; isCorrect = (q.ans===q.ci);
+      qLabel = `\u{1f50a} ${q.play}`; ansLabel = q.opts[q.ci];
+    } else if (q.type==='lb') {
+      total++; isCorrect = (q.ans===q.ci);
+      qLabel = `\u{1f50a} \u5b57\u6bcd ${q.letter}`; ansLabel = `${q.letter}${q.letter.toLowerCase()}`;
+    } else if (q.type==='lc2') {
+      total++; isCorrect = (q.ans===q.ci);
+      qLabel = `\u{1f50a} \u7b2c${q.position}\u500b`;
+      ansLabel = `${EMOJI_MAP[q.opts[q.ci][0]]||''} ${q.opts[q.ci][0]}`;
+    } else if (q.type==='wa') {
+      total++; isCorrect = (q.ans===q.ci);
+      qLabel = `\u270f\ufe0f ${q.src} \u2192`; ansLabel = q.answer;
+    } else if (q.type==='wb') {
+      total++; isCorrect = (q.ans===q.ci);
+      qLabel = `\u{1f3a8} ${q.c1}+${q.c2}`; ansLabel = q.result;
+    } else if (q.type==='wc') {
+      total++; isCorrect = (q.ans===q.ci);
+      qLabel = `\u{1f5bc}\ufe0f ${EMOJI_MAP[q.word[0]]||'?'}`; ansLabel = q.word[0];
+    } else if (q.type==='cz') {
+      total++; isCorrect = (q.ans===q.ci);
+      qLabel = `📝 ${q.word[0].split('').map((c,i)=>i===q.letterIdx?'_':c).join('')}`;
+      ansLabel = q.opts[q.ci];
+    }
+    if (isCorrect) { correct++; }
+    else { wrongList.push({section:q.section, qLabel, ansLabel}); }
+  });
+
+  const pct = Math.round(correct/total*100);
+  const emoji = pct>=90?'\u{1f389}':pct>=70?'\u{1f60a}':pct>=50?'\u{1f642}':'\u{1f605}';
+
+  // Daily leaderboard
+  const elapsedSecs = Math.round((Date.now() - (peState.startTime || Date.now())) / 1000);
+  const today = new Date().toISOString().slice(0, 10);
+  const dailyKey = `pe_daily_${today}`;
+  const dailyData = JSON.parse(localStorage.getItem(dailyKey) || '[]');
+  const curDiff = peDiff();
+  dailyData.push({name: selName, score: pct, secs: elapsedSecs, diff: curDiff});
+  dailyData.sort((a,b) => b.score - a.score || a.secs - b.secs);
+  const top10 = dailyData.slice(0, 10);
+  localStorage.setItem(dailyKey, JSON.stringify(top10));
+
+  const wrongHtml = wrongList.length > 0 ? `
+    <div style="background:#fff8f8;border:1px solid #ffd6d6;border-radius:12px;padding:12px;margin-bottom:14px;text-align:left">
+      <div style="font-size:.8rem;font-weight:800;color:#e55;margin-bottom:8px">\u274c \u7b54\u932f\u7684\u984c\u76ee\uff1a</div>
+      ${wrongList.map(w=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:.74rem;padding:5px 0;border-bottom:1px solid #ffe0e0;gap:6px">
+        <span style="color:#ccc;flex-shrink:0">${w.section.split('.')[0]}</span>
+        <span style="color:#555;flex:1">${w.qLabel}</span>
+        <span style="color:#43a047;font-weight:700;flex-shrink:0">\u2713 ${w.ansLabel}</span>
+      </div>`).join('')}
+    </div>` : `<div style="color:#43a047;font-size:.85rem;text-align:center;margin-bottom:14px">\u{1f38a} \u5168\u90e8\u7b54\u5c0d\uff01</div>`;
+
+  const weakData = JSON.parse(localStorage.getItem(peWeakKey()) || '{}');
+  const topWeak = Object.entries(weakData).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const weakHtml = topWeak.length > 0 ? `
+    <div style="background:#fffbf0;border:1px solid #ffe082;border-radius:12px;padding:12px;margin-bottom:14px;text-align:left">
+      <div style="font-size:.8rem;font-weight:800;color:#f57c00;margin-bottom:8px">\u{1f4ca} \u7d2f\u7a4d\u5e38\u932f Top ${topWeak.length}\uff1a</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${topWeak.map(([wk,cnt])=>`
+        <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:4px 10px;font-size:.78rem;color:#e65100">
+          <b>${wk}</b> <span style="color:#aaa">${cnt}\u6b21</span>
+        </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  document.getElementById('pe-body').innerHTML = `
+    <div style="text-align:center;padding:16px 8px">
+      <div style="font-size:4rem;margin-bottom:8px">${emoji}</div>
+      <div style="font-size:2.8rem;font-weight:800;color:#667eea;margin-bottom:6px">${pct} \u5206</div>
+      <div style="font-size:.88rem;color:#888;margin-bottom:6px">${correct} \u984c\u7b54\u5c0d / \u5171 ${total} \u984c</div>
+      <div style="font-size:.9rem;color:#3d3d6b;font-weight:700;margin-bottom:16px">${selName} \u52a0\u6cb9\uff01\u7e7c\u7e8c\u7df4\u7fd2\uff01</div>
+      ${wrongHtml}
+      ${weakHtml}
+      <div style="background:#f0f4ff;border:1px solid #c5cae9;border-radius:12px;padding:12px;margin-bottom:14px;text-align:left">
+        <div style="font-size:.8rem;font-weight:800;color:#3d3d6b;margin-bottom:8px">🏆 今日排行榜：</div>
+        ${top10.map((e,i)=>`
+        <div style="display:flex;align-items:center;font-size:.78rem;padding:5px 0;border-bottom:1px solid #e8eaf6;gap:8px">
+          <span style="font-size:.88rem;width:22px;text-align:center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>
+          <span style="flex:1;color:#3d3d6b;font-weight:600">${e.name}</span>
+          <span style="color:#667eea;font-weight:800">${e.score}分</span>
+          <span style="color:#aaa;font-size:.72rem">${e.secs}秒</span>
+        </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button onclick="goMenu()" style="background:#f0f0f0;border:none;border-radius:12px;padding:12px 24px;font-size:.9rem;font-weight:700;cursor:pointer;color:#555">\u8fd4\u56de\u9078\u55ae</button>
+        <button onclick="startPaperExam()" style="background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:12px;padding:12px 24px;font-size:.9rem;font-weight:700;cursor:pointer;color:#fff">\u518d\u8003\u4e00\u6b21</button>
+      </div>
+    </div>`;
+  // Auto-increment difficulty when score >= 90
+  if (pct >= 90 && curDiff < 2) {
+    const newDiff = curDiff + 1;
+    localStorage.setItem('pe_diff_' + selName, newDiff);
+    const diffUpMsg = document.getElementById('pe-body');
+    if (diffUpMsg) {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a5c38;border-radius:10px;padding:10px 14px;font-size:.82rem;font-weight:700;margin-bottom:12px;text-align:center';
+      banner.textContent = '\u1f389 \u606d\u559c\uff01\u96e3\u5ea6\u5df2\u63d0\u5347\u70ba ' + PE_DIFF_LABELS[newDiff];
+      diffUpMsg.insertBefore(banner, diffUpMsg.firstChild);
+    }
+  }
+  if (pct>=80) launchConfetti(pct);
+}
+
 </script>
 </body>
 </html>
