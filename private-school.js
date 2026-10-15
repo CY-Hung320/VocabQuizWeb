@@ -531,7 +531,7 @@
     const box=document.querySelector('.ps-test');
     box.insertAdjacentHTML('beforeend',`<div class="ps-explain ${correct?'good':'wrong'}"><strong>${timedOut?'時間到！這題算答錯。':correct?'答對了！':'這題要再練習'}</strong><br>${esc(item.explain)}<button onclick="PrivateSchool.next()">${state.index===state.quiz.length-1?'看成績':'下一題 →'}</button></div>`);
   }
-  function next(){ clearQuestionTimer(); clearAutoNext(); if(++state.index>=state.quiz.length) finish(); else renderQuestion(); }
+  function next(){ stopSpeech(); clearQuestionTimer(); clearAutoNext(); if(++state.index>=state.quiz.length) finish(); else renderQuestion(); }
   function finish(){
     const wrong=getWrong(); let correct=0;
     state.answers.forEach(a=>{ if(a.correct){correct++; if(wrong[a.id]){wrong[a.id].count=Math.max(0,wrong[a.id].count-1); if(!wrong[a.id].count)delete wrong[a.id];}} else {const item=BANK.find(x=>x.id===a.id);wrong[a.id]={count:(wrong[a.id]?.count||0)+1,at:Date.now(),type:item.type};} }); saveWrong(wrong);
@@ -619,7 +619,7 @@
       // 以發音拼寫送進語音引擎，避免某些瀏覽器把單獨字母念成「capital A」；畫面仍維持大寫 A～D。
       : bracketedEnglish || `${item.passage?item.passage+' ':''}${item.stem}${optionBreak}${item.opts.map((option,index)=>`${['ay','bee','see','dee'][index]}${optionLabelBreak}${option}`).join(optionBreak)}`;
     // 部分語音會把標點讀成名稱；朗讀時略過問號與句號。
-    const text=rawText.replace(/[?？.。]/g,'');
+    const text=rawText.replace(/[?？.。"“”]/g,'');
     const voices=speechSynthesis.getVoices();
     // 優先年輕、有活力的美式女聲；Windows 的 Natural／Online 聲音通常最清楚。
     const englishVoice = voices.find(v => /en[-_]US/i.test(v.lang) && /(Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria))/i.test(v.name))
