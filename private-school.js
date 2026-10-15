@@ -573,8 +573,9 @@
     const item=BANK.find(x=>x.id===id);
     if(!item||!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
-    // 只念文章（若有）與題幹，絕不念 A/B/C/D 選項；中英文使用各自語音，避免中文被跳過。
-    const text=(item.passage?item.passage+' ':'')+item.stem;
+    // 題幹若有中括號英文（如 [aunt]），只念該英文單字；否則念文章與完整題幹，不念選項。
+    const bracketedEnglish=item.stem.match(/[\[［]\s*([A-Za-z][A-Za-z' -]*)\s*[\]］]/);
+    const text=bracketedEnglish ? bracketedEnglish[1] : (item.passage?item.passage+' ':'')+item.stem;
     const voices=speechSynthesis.getVoices();
     // 優先年輕、有活力的美式女聲；Windows 的 Natural／Online 聲音通常最清楚。
     const englishVoice = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria)/i.test(v.name))
@@ -584,7 +585,7 @@
     const chineseVoice = voices.find(v => /zh[-_]TW/i.test(v.lang) && /Microsoft.*(HsiaoYu|HanHan|YunJhe).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(HsiaoYu|HanHan|YunJhe)/i.test(v.name))
       || voices.find(v => /zh[-_]TW/i.test(v.lang) && /Microsoft|Google/i.test(v.name))
       || voices.find(v => /zh[-_]TW/i.test(v.lang));
-    const parts=(text.match(/[\u3400-\u9fff，。！？、；：「」『』（）]+|[^\u3400-\u9fff，。！？、；：「」『』（）]+/g)||[]).filter(part=>part.trim());
+    const parts=(bracketedEnglish ? [text] : (text.match(/[\u3400-\u9fff，。！？、；：「」『』（）]+|[^\u3400-\u9fff，。！？、；：「」『』（）]+/g)||[])).filter(part=>part.trim());
     let index=0;
     const speakNext=()=>{
       if(index>=parts.length) return;
