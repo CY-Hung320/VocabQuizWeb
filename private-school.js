@@ -5,6 +5,7 @@
   const MASTERED_KEY = 'private_school_mastered_v1';
   const HISTORY_KEY = 'private_school_recent_questions_v1';
   const ATTEMPTS_KEY = 'private_school_attempts_v1';
+  const CLOZE_ROUND_KEY = 'private_school_cloze_rounds_v1';
   const TYPES = { vocab:'字彙測驗', grammar:'文法測驗', cloze:'克漏字測驗', reading:'閱讀測驗' };
   // 依題庫目錄順序：自我介紹與家庭、學校生活、日常作息、食物餐廳、嗜好、交通問路。
   const LESSONS = ['Unit 1 自我介紹與家庭','Unit 2 學校生活與科目','Unit 3 日常作息與習慣','Unit 4 食物與餐廳','Unit 5 嗜好與休閒時光','Unit 6 交通與問路'];
@@ -403,9 +404,29 @@
   const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
   const getAttempts = () => { try { const x=JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||'[]'); return Array.isArray(x)?x.filter(a=>a&&a.completedAt>=Date.now()-ONE_YEAR_MS):[]; } catch { return []; } };
   const saveAttempts = x => localStorage.setItem(ATTEMPTS_KEY,JSON.stringify(x));
+  const getClozeRounds = () => { try { return JSON.parse(localStorage.getItem(CLOZE_ROUND_KEY)||'{}'); } catch { return {}; } };
+  const saveClozeRounds = x => localStorage.setItem(CLOZE_ROUND_KEY,JSON.stringify(x));
   const sameLocalDay = (time, now=new Date()) => { const d=new Date(time); return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate(); };
   const timeLabel = time => new Intl.DateTimeFormat('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(time));
   const shuffle = a => [...a].sort(()=>Math.random()-.5);
+  // 滿分後使用新的題組：答案與四個選項永遠只取自同一 Unit 的 20 個核心單字。
+  // 題幹會依輪次更換不同的閱讀任務，避免學生背選項位置或舊題答案。
+  function advancedCloze(lesson, round){
+    const words=vocabWords.filter(w=>w[2]===lesson);
+    const tasks=[
+      w=>`閱讀 ${LESSONS[lesson]} 的情境提示後，選出最符合空格的字：The best word for “${w[1]}” is ___.`,
+      w=>`在一段 ${LESSONS[lesson]} 的短文中，空格應填入能表達「${w[1]}」的字：___.`,
+      w=>`請依上下文選出最精確的 Unit ${lesson+1} 單字：___ means “${w[1]}”.`,
+      w=>`這是 Unit ${lesson+1} 的延伸應用題；最適合填入空格的是 ___（意思：${w[1]}）。`,
+      w=>`閱讀題組的關鍵線索是「${w[1]}」，請選出正確的英文單字：___.`
+    ];
+    return words.map((word,index)=>{
+      const others=words.filter(w=>w[0]!==word[0]).map(w=>w[0]);
+      const choices=[word[0],...Array.from({length:3},(_,n)=>others[(index+round+n*3)%others.length])];
+      const task=tasks[(round+index)%tasks.length](word);
+      return q(`adcloze-${lesson}-${round}-${index}`,'cloze',lesson,task,shuffle(choices),0,`${word[0]} = ${word[1]}。第 ${round+1} 輪延伸題，答案與選項均限本 Unit 字彙。`);
+    }).map(item=>{const correct=words.find(w=>item.opts.includes(w[0])&&item.stem.includes(`“${w[1]}”`)); if(correct)item.answer=item.opts.indexOf(correct[0]); return item;});
+  }
   function choose(pool,n) {
     const wrong=getWrong();
     const history=getHistory();
@@ -420,7 +441,12 @@
   function start() {
     const types=[...state.selected];
     if(!types.length) return alert('請至少選一種測驗。');
-    const pool=BANK.filter(x=>types.includes(x.type)&&state.lessons.has(x.lesson));
+    let pool=BANK.filter(x=>types.includes(x.type)&&state.lessons.has(x.lesson));
+    // 單選某 Unit 的克漏字：只要前一組 20 題全對，就自動載入下一輪新題。
+    if(types.length===1&&types[0]==='cloze'&&state.lessons.size===1){
+      const lesson=[...state.lessons][0], round=getClozeRounds()[lesson]||0;
+      if(round>0) pool=advancedCloze(lesson,round);
+    }
     if(!pool.length) return alert('此篩選條件還沒有題目。');
     const target=Math.min(20,pool.length);
     const per=Math.floor(target/types.length), remainder=target%types.length;
@@ -477,6 +503,12 @@
     });
     saveWrong(wrong); saveMastered(mastered);
     const score=Math.round(correct/state.quiz.length*100), weak=Object.keys(wrong).length, familiar=Object.keys(mastered).length;
+    const onlyOneClozeUnit=state.quiz.length===20&&state.quiz.every(item=>item.type==='cloze'&&item.lesson===state.quiz[0].lesson);
+    if(score===100&&onlyOneClozeUnit){
+      const rounds=getClozeRounds(), lesson=state.quiz[0].lesson;
+      rounds[lesson]=(rounds[lesson]||0)+1;
+      saveClozeRounds(rounds);
+    }
     const completedAt=Date.now();
     const attempt={
       id:'a'+completedAt+'-'+Math.random().toString(36).slice(2,7), completedAt, score,
