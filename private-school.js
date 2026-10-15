@@ -573,11 +573,11 @@
     const item=BANK.find(x=>x.id===id);
     if(!item||!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
-    // 題幹中任何常見括號內的英文（如 [aunt]、(aunt)、（aunt））都只念該英文；答案解析則一定完整朗讀。
+    // 題幹中任何常見括號內的英文（如 [aunt]、(aunt)、（aunt））都只念該英文；其他題目會連同 A～D 選項朗讀。
     const bracketedEnglish=mode==='question'&&Array.from(item.stem.matchAll(/[\[［(（{｛<＜〈《「『]\s*([A-Za-z][A-Za-z' -]*)\s*[\]］)）}｝>＞〉》」』]/g)).map(match=>match[1]).find(Boolean);
     const rawText=mode==='explanation'
       ? `正確答案：${item.opts[item.answer]}。解析：${item.explain}`
-      : bracketedEnglish || (item.passage?item.passage+' ':'')+item.stem;
+      : bracketedEnglish || `${item.passage?item.passage+' ':''}${item.stem}。${item.opts.map((option,index)=>`${'ABCD'[index]} ${option}`).join('。')}`;
     // 部分語音會把標點讀成名稱；朗讀時略過問號與句號。
     const text=rawText.replace(/[?？.。]/g,'');
     const voices=speechSynthesis.getVoices();
