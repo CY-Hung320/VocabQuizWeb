@@ -604,9 +604,10 @@
     setStopVisible(true);
     // 題幹中任何常見括號內的英文（如 [aunt]、(aunt)、（aunt））都只念該英文；其他題目會連同 A～D 選項朗讀。
     const bracketedEnglish=mode==='question'&&Array.from(item.stem.matchAll(/[\[［(（{｛<＜〈《「『]\s*([A-Za-z][A-Za-z' -]*)\s*[\]］)）}｝>＞〉》」』]/g)).map(match=>match[1]).find(Boolean);
+    const optionBreak='§§§';
     const rawText=mode==='explanation'
       ? `正確答案：${item.opts[item.answer]}。解析：${item.explain}`
-      : bracketedEnglish || `${item.passage?item.passage+' ':''}${item.stem}。${item.opts.map((option,index)=>`${'ABCD'[index]} ${option}`).join('。')}`;
+      : bracketedEnglish || `${item.passage?item.passage+' ':''}${item.stem}${optionBreak}${item.opts.map((option,index)=>`${'ABCD'[index]} ${option}`).join(optionBreak)}`;
     // 部分語音會把標點讀成名稱；朗讀時略過問號與句號。
     const text=rawText.replace(/[?？.。]/g,'');
     const voices=speechSynthesis.getVoices();
@@ -618,12 +619,15 @@
     const chineseVoice = voices.find(v => /zh[-_]TW/i.test(v.lang) && /Microsoft.*(HsiaoYu|HanHan|YunJhe).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(HsiaoYu|HanHan|YunJhe)/i.test(v.name))
       || voices.find(v => /zh[-_]TW/i.test(v.lang) && /Microsoft|Google/i.test(v.name))
       || voices.find(v => /zh[-_]TW/i.test(v.lang));
-    const parts=(bracketedEnglish ? [text] : (text.match(/[\u3400-\u9fff，。！？、；：「」『』（）]+|[^\u3400-\u9fff，。！？、；：「」『』（）]+/g)||[])).filter(part=>part.trim());
+    const splitLanguages=section=>(section.match(/[\u3400-\u9fff，。！？、；：「」『』（）]+|[^\u3400-\u9fff，。！？、；：「」『』（）]+/g)||[]).filter(part=>part.trim());
+    const sections=bracketedEnglish?[text]:text.split(optionBreak);
+    const parts=sections.flatMap((section,index)=>[...splitLanguages(section),...(mode==='question'&&index>0&&index<sections.length-1?['__option_pause__']:[])]);
     let index=0;
     const speakNext=()=>{
       if(run!==speechRun) return;
       if(index>=parts.length){setStopVisible(false);return;}
       const part=parts[index++];
+      if(part==='__option_pause__'){setTimeout(speakNext,500);return;}
       const isChinese=/[\u3400-\u9fff]/.test(part);
       const voice=new SpeechSynthesisUtterance(part);
       voice.lang=isChinese?'zh-TW':'en-US';
