@@ -175,7 +175,20 @@
     document.getElementById('ps-app').innerHTML=`<section class="ps-card ps-result"><div class="ps-medal">${score>=90?'🏆':score>=70?'💪':'📚'}</div><h1>${score} 分</h1><p>答對 ${correct} / ${state.quiz.length} 題</p><h2>${score>=90?'達標！維持節奏，開始錯題複習。':score>=70?'快接近 90 分了，先把錯題練熟。':'先從常犯錯題庫開始，反覆練習最有效。'}</h2><div class="ps-summary">目前累積 <b>${weak}</b> 題常錯題；答對一次會降低它的出現權重。</div><button class="ps-primary" onclick="PrivateSchool.review()">常犯錯題庫</button><button class="ps-secondary" onclick="PrivateSchool.home()">回私中專區</button></section>`;
   }
   function review(){ const wrong=getWrong(), ids=Object.keys(wrong); if(!ids.length){alert('太棒了，目前沒有常犯錯題！');return;} state.quiz=shuffle(ids.map(id=>BANK.find(x=>x.id===id)).filter(Boolean)).slice(0,20);state.index=0;state.answers=[];renderQuestion(); }
-  function speakItem(id){ const item=BANK.find(x=>x.id===id); if(!item||!('speechSynthesis' in window))return; speechSynthesis.cancel(); const text=(item.passage?item.passage+' ': '')+item.stem+'. '+item.opts.join(', '); const voice=new SpeechSynthesisUtterance(text); voice.lang='en-US'; voice.rate=.82; speechSynthesis.speak(voice); }
+  function speakItem(id){
+    const item=BANK.find(x=>x.id===id);
+    if(!item||!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    // 字彙題只念英文單字本身；其他類型保留朗讀文章、題幹與選項。
+    const wordIndex=item.type==='vocab' ? Number(id.slice(1)) : -1;
+    const text=item.type==='vocab' && vocabWords[wordIndex]
+      ? vocabWords[wordIndex][0]
+      : (item.passage?item.passage+' ': '')+item.stem+'. '+item.opts.join(', ');
+    const voice=new SpeechSynthesisUtterance(text);
+    voice.lang='en-US';
+    voice.rate=.82;
+    speechSynthesis.speak(voice);
+  }
   function practice(){
     const items=BANK.filter(x=>state.selected.has(x.type)&&state.lessons.has(x.lesson));
     document.getElementById('ps-app').innerHTML=`<section class="ps-card"><header><button class="ps-back" onclick="PrivateSchool.home()">← 回設定</button><span>私中專區 · 練習</span><b>${items.length} 題</b></header><div class="ps-hero"><div>📖</div><h1>範圍練習</h1><p>查看所選 Unit 的題目、選項與解析；按 🔊 可聽英文題目。</p></div>${items.map((item,i)=>`<article class="ps-practice"><div class="ps-qtype">${i+1}. ${LESSONS[item.lesson]} · ${TYPES[item.type]}</div>${item.passage?`<div class="ps-passage">${esc(item.passage)}</div>`:''}<div class="ps-question-row"><h2>${esc(item.stem)}</h2><button class="ps-speak" onclick="PrivateSchool.speakItem('${item.id}')" title="朗讀題目">🔊</button></div><ol>${item.opts.map(o=>`<li>${esc(o)}</li>`).join('')}</ol><button class="ps-answer" onclick="PrivateSchool.toggleAnswer('${item.id}')">顯示答案與解析</button><div id="ps-a-${item.id}" class="ps-answer-box" hidden><b>答案：${'ABCD'[item.answer]}. ${esc(item.opts[item.answer])}</b><br>${esc(item.explain)}</div></article>`).join('')||'<p>請先選擇至少一種測驗與一個 Unit。</p>'}</section>`;
