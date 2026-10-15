@@ -50,6 +50,13 @@
     q('g24','grammar',5,'The train will leave ___ ten minutes.',['on','at','in','for'],2,'in + 一段時間表示「在…之後」。')
   ];
 
+  // 每題正解位置隨機，避免所有單字題的答案都固定在第一個選項。
+  vocab.forEach(item => {
+    const correct = item.opts[item.answer];
+    item.opts.sort(() => Math.random() - .5);
+    item.answer = item.opts.indexOf(correct);
+  });
+
   // 舊版建立題目時把 Unit 2–4 的題材順序放錯；此處依正式目錄重新標示。
   grammar.slice(5,9).forEach(x => x.lesson = 3);   // 食物與餐廳
   grammar.slice(9,13).forEach(x => x.lesson = 1);  // 學校生活與科目
