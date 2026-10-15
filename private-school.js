@@ -393,7 +393,7 @@
   const BANK = [...vocab,...grammar,...cloze,...reading];
 
   // 首次開啟預設從 Unit 1 開始，避免一次載入所有範圍。
-  let state = { selected:new Set(['vocab']), lessons:new Set([0]), quiz:[], index:0, answers:[], mode:'test' };
+  let state = { selected:new Set(['vocab']), lessons:new Set([0]), quiz:[], index:0, answers:[], mode:'test', timerId:null, questionStartedAt:0 };
   let speechRun=0;
   const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const getWrong = () => { try { return JSON.parse(localStorage.getItem(KEY)||'{}'); } catch { return {}; } };
@@ -409,6 +409,8 @@
   const saveClozeRounds = x => localStorage.setItem(CLOZE_ROUND_KEY,JSON.stringify(x));
   const sameLocalDay = (time, now=new Date()) => { const d=new Date(time); return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate(); };
   const timeLabel = time => new Intl.DateTimeFormat('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(time));
+  const durationLabel = seconds => { const value=Math.max(0,Math.round(seconds||0)); return `${Math.floor(value/60)} 分 ${String(value%60).padStart(2,'0')} 秒`; };
+  const attemptDuration = attempt => typeof attempt.totalSeconds==='number' ? attempt.totalSeconds : attempt.answers.reduce((sum,answer)=>sum+(answer.elapsedSeconds||0),0);
   const shuffle = a => [...a].sort(()=>Math.random()-.5);
   // 滿分後使用新的題組：答案與四個選項永遠只取自同一 Unit 的 20 個核心單字。
   // 題幹會依輪次更換不同的閱讀任務，避免學生背選項位置或舊題答案。
@@ -486,20 +488,41 @@
     saveHistory(recent);
     state.index=0; state.answers=[]; renderQuestion();
   }
+  function clearQuestionTimer(){if(state.timerId){clearInterval(state.timerId);state.timerId=null;}}
+  function questionLimit(item){return item.type==='reading'?60:30;}
+  function startQuestionTimer(item){
+    clearQuestionTimer();
+    const limit=questionLimit(item);
+    state.questionStartedAt=Date.now();
+    const update=()=>{
+      const left=Math.max(0,Math.ceil((limit*1000-(Date.now()-state.questionStartedAt))/1000));
+      const clock=document.getElementById('ps-timer');
+      if(clock) clock.textContent=`⏱ ${left} 秒`;
+      if(left<=0){clearQuestionTimer();answer(-1,true);}
+    };
+    update(); state.timerId=setInterval(update,200);
+  }
   function renderQuestion() {
     const item=state.quiz[state.index];
     const typeLabel=TYPES[item.type];
-    document.getElementById('ps-app').innerHTML=`<section class="ps-card ps-test"><header><button class="ps-back" onclick="PrivateSchool.home()">← 離開</button><span>私中專區 · ${typeLabel}</span><b>${state.index+1} / ${state.quiz.length}</b></header><div class="ps-progress"><i style="width:${(state.index/state.quiz.length)*100}%"></i></div>${item.passage?`<article class="ps-passage">${esc(item.passage)}</article>`:''}<div class="ps-qtype">${LESSONS[item.lesson]} · ${typeLabel}</div><div class="ps-question-row"><h2>${esc(item.stem)}</h2><button class="ps-speak" onclick="PrivateSchool.speakItem('${item.id}')" title="朗讀題目">🔊</button></div><div class="ps-options">${item.opts.map((o,i)=>`<button onclick="PrivateSchool.answer(${i})"><b>${'ABCD'[i]}</b>${esc(o)}</button>`).join('')}</div><p class="ps-tip">答錯會自動收入「常犯錯題庫」，下次優先複習。</p></section>`;
+    const limit=questionLimit(item);
+    document.getElementById('ps-app').innerHTML=`<section class="ps-card ps-test"><header><button class="ps-back" onclick="PrivateSchool.home()">← 離開</button><span>私中專區 · ${typeLabel}</span><b>${state.index+1} / ${state.quiz.length}</b></header><div class="ps-progress"><i style="width:${(state.index/state.quiz.length)*100}%"></i></div>${item.passage?`<article class="ps-passage">${esc(item.passage)}</article>`:''}<div class="ps-qtype">${LESSONS[item.lesson]} · ${typeLabel}<b id="ps-timer" class="ps-timer">⏱ ${limit} 秒</b></div><div class="ps-question-row"><h2>${esc(item.stem)}</h2><button class="ps-speak" onclick="PrivateSchool.speakItem('${item.id}')" title="朗讀題目">🔊</button></div><div class="ps-options">${item.opts.map((o,i)=>`<button onclick="PrivateSchool.answer(${i})"><b>${'ABCD'[i]}</b>${esc(o)}</button>`).join('')}</div><p class="ps-tip">字彙、文法、克漏字每題限時 30 秒；閱讀每題限時 60 秒。</p></section>`;
+    startQuestionTimer(item);
   }
-  function answer(choice) {
-    const item=state.quiz[state.index], correct=choice===item.answer;
-    state.answers.push({id:item.id,choice,correct});
+  function answer(choice,timedOut=false) {
+    const item=state.quiz[state.index];
+    if(!item||state.answers.length!==state.index) return;
+    const limit=questionLimit(item);
+    const elapsedSeconds=Math.min(limit,Math.max(0,Math.ceil((Date.now()-state.questionStartedAt)/1000)));
+    clearQuestionTimer();
+    const correct=!timedOut&&choice===item.answer;
+    state.answers.push({id:item.id,choice,correct,elapsedSeconds,timedOut});
     const buttons=[...document.querySelectorAll('.ps-options button')];
     buttons.forEach((b,i)=>{b.disabled=true;if(i===item.answer)b.classList.add('ok');else if(i===choice)b.classList.add('bad');});
     const box=document.querySelector('.ps-test');
-    box.insertAdjacentHTML('beforeend',`<div class="ps-explain ${correct?'good':'wrong'}"><strong>${correct?'答對了！':'這題要再練習'}</strong><br>${esc(item.explain)}<button onclick="PrivateSchool.next()">${state.index===state.quiz.length-1?'看成績':'下一題 →'}</button></div>`);
+    box.insertAdjacentHTML('beforeend',`<div class="ps-explain ${correct?'good':'wrong'}"><strong>${timedOut?'時間到！這題算答錯。':correct?'答對了！':'這題要再練習'}</strong><br>${esc(item.explain)}<button onclick="PrivateSchool.next()">${state.index===state.quiz.length-1?'看成績':'下一題 →'}</button></div>`);
   }
-  function next(){ if(++state.index>=state.quiz.length) finish(); else renderQuestion(); }
+  function next(){ clearQuestionTimer(); if(++state.index>=state.quiz.length) finish(); else renderQuestion(); }
   function finish(){
     const wrong=getWrong(); let correct=0;
     state.answers.forEach(a=>{ if(a.correct){correct++; if(wrong[a.id]){wrong[a.id].count=Math.max(0,wrong[a.id].count-1); if(!wrong[a.id].count)delete wrong[a.id];}} else {const item=BANK.find(x=>x.id===a.id);wrong[a.id]={count:(wrong[a.id]?.count||0)+1,at:Date.now(),type:item.type};} }); saveWrong(wrong);
@@ -530,6 +553,7 @@
     });
     saveWrong(wrong); saveMastered(mastered);
     const score=Math.round(correct/state.quiz.length*100), weak=Object.keys(wrong).length, familiar=Object.keys(mastered).length;
+    const totalSeconds=state.answers.reduce((sum,answer)=>sum+(answer.elapsedSeconds||0),0);
     const onlyOneClozeUnit=state.quiz.length===20&&state.quiz.every(item=>item.type==='cloze'&&item.lesson===state.quiz[0].lesson);
     if(score===100&&onlyOneClozeUnit){
       const rounds=getClozeRounds(), lesson=state.quiz[0].lesson;
@@ -538,12 +562,12 @@
     }
     const completedAt=Date.now();
     const attempt={
-      id:'a'+completedAt+'-'+Math.random().toString(36).slice(2,7), completedAt, score,
+      id:'a'+completedAt+'-'+Math.random().toString(36).slice(2,7), completedAt, score, totalSeconds,
       answers:state.answers.map(a=>{ const item=BANK.find(x=>x.id===a.id); return {...a,item:item?{...item,opts:[...item.opts]}:null}; })
     };
     // 保留最近一年的完整作答內容，方便日後點開複習；逾一年才會自動清除。
     saveAttempts([...getAttempts(),attempt]);
-    document.getElementById('ps-app').innerHTML=`<section class="ps-card ps-result"><div class="ps-medal">${score>=90?'🏆':score>=70?'💪':'📚'}</div><h1>${score} 分</h1><p>答對 ${correct} / ${state.quiz.length} 題</p><h2>${score>=90?'達標！維持節奏，開始錯題複習。':score>=70?'快接近 90 分了，先把錯題練熟。':'先從常犯錯題庫開始，反覆練習最有效。'}</h2><div class="ps-summary">目前有 <b>${weak}</b> 題常錯題、<b>${familiar}</b> 題已練熟題。常錯題要連續答對 5 次才會畢業。</div><button class="ps-primary" onclick="PrivateSchool.review()">常犯錯題庫</button><button class="ps-secondary" onclick="PrivateSchool.home()">回私中專區</button></section>`;
+    document.getElementById('ps-app').innerHTML=`<section class="ps-card ps-result"><div class="ps-medal">${score>=90?'🏆':score>=70?'💪':'📚'}</div><h1>${score} 分</h1><p>答對 ${correct} / ${state.quiz.length} 題 · 總用時 ${durationLabel(totalSeconds)}</p><h2>${score>=90?'達標！維持節奏，開始錯題複習。':score>=70?'快接近 90 分了，先把錯題練熟。':'先從常犯錯題庫開始，反覆練習最有效。'}</h2><div class="ps-summary">目前有 <b>${weak}</b> 題常錯題、<b>${familiar}</b> 題已練熟題。常錯題要連續答對 5 次才會畢業。</div><button class="ps-primary" onclick="PrivateSchool.review()">常犯錯題庫</button><button class="ps-secondary" onclick="PrivateSchool.home()">回私中專區</button></section>`;
   }
   function review(){ const wrong=getWrong(), ids=Object.keys(wrong); if(!ids.length){alert('太棒了，目前沒有常犯錯題！');return;} state.quiz=shuffle(ids.map(id=>BANK.find(x=>x.id===id)).filter(Boolean)).slice(0,20);state.index=0;state.answers=[];renderQuestion(); }
   function reviewMastered(){
@@ -556,7 +580,7 @@
     const attempt=getAttempts().find(x=>x.id===id);
     if(!attempt) return alert('找不到這次考試紀錄。');
     const correct=attempt.answers.filter(x=>x.correct).length, wrong=attempt.answers.length-correct;
-    document.getElementById('ps-app').innerHTML=`<section class="ps-card"><header><button class="ps-back" onclick="PrivateSchool.home()">← 回紀錄</button><span>當次考試複習</span><b>${timeLabel(attempt.completedAt)}</b></header><div class="ps-hero"><div>🧾</div><h1>${attempt.score} 分</h1><p>答對 ${correct} 題 · 答錯 ${wrong} 題 · 題目與作答結果如下</p></div>${wrong?`<button class="ps-primary" style="width:100%;margin-bottom:8px" onclick="PrivateSchool.reviewAttemptWrong('${attempt.id}')">🎯 重新練習這次的 ${wrong} 題錯題</button>`:'<p class="ps-note">這次全對，沒有需要重練的錯題。</p>'}${attempt.answers.map((answer,i)=>{const item=answer.item||BANK.find(x=>x.id===answer.id); if(!item)return ''; const picked=typeof answer.choice==='number'?answer.choice:-1; const chosen=answer.selectedText||item.opts[picked]||'未記錄'; const right=answer.correctText||item.opts[item.answer]; return `<article class="ps-practice ${answer.correct?'ps-attempt-ok':'ps-attempt-bad'}"><div class="ps-qtype">${i+1}. ${LESSONS[item.lesson]} · ${TYPES[item.type]} · ${answer.correct?'✅ 答對':'❌ 答錯'}</div>${item.passage?`<div class="ps-passage">${esc(item.passage)}</div>`:''}<div class="ps-question-row"><h2>${esc(item.stem)}</h2><button class="ps-speak" onclick="PrivateSchool.speakItem('${item.id}')" title="朗讀題目">🔊</button></div><ol>${item.opts.map((o,n)=>`<li class="${o===right?'ps-correct-choice':''}">${'ABCD'[n]}. ${esc(o)}</li>`).join('')}</ol><div class="ps-answer-box"><b>你的答案：${esc(chosen)}</b><br><b>正確答案：${esc(right)}</b><br>${esc(item.explain)}</div></article>`;}).join('')}</section>`;
+    document.getElementById('ps-app').innerHTML=`<section class="ps-card"><header><button class="ps-back" onclick="PrivateSchool.home()">← 回紀錄</button><span>當次考試複習</span><b>${timeLabel(attempt.completedAt)}</b></header><div class="ps-hero"><div>🧾</div><h1>${attempt.score} 分</h1><p>答對 ${correct} 題 · 答錯 ${wrong} 題 · 總用時 ${durationLabel(attemptDuration(attempt))}</p></div>${wrong?`<button class="ps-primary" style="width:100%;margin-bottom:8px" onclick="PrivateSchool.reviewAttemptWrong('${attempt.id}')">🎯 重新練習這次的 ${wrong} 題錯題</button>`:'<p class="ps-note">這次全對，沒有需要重練的錯題。</p>'}${attempt.answers.map((answer,i)=>{const item=answer.item||BANK.find(x=>x.id===answer.id); if(!item)return ''; const picked=typeof answer.choice==='number'?answer.choice:-1; const chosen=answer.selectedText||item.opts[picked]||'未記錄'; const right=answer.correctText||item.opts[item.answer]; return `<article class="ps-practice ${answer.correct?'ps-attempt-ok':'ps-attempt-bad'}"><div class="ps-qtype">${i+1}. ${LESSONS[item.lesson]} · ${TYPES[item.type]} · ${answer.correct?'✅ 答對':'❌ 答錯'}${typeof answer.elapsedSeconds==='number'?` · 用時 ${durationLabel(answer.elapsedSeconds)}`:''}</div>${item.passage?`<div class="ps-passage">${esc(item.passage)}</div>`:''}<div class="ps-question-row"><h2>${esc(item.stem)}</h2><button class="ps-speak" onclick="PrivateSchool.speakItem('${item.id}')" title="朗讀題目">🔊</button></div><ol>${item.opts.map((o,n)=>`<li class="${o===right?'ps-correct-choice':''}">${'ABCD'[n]}. ${esc(o)}</li>`).join('')}</ol><div class="ps-answer-box"><b>你的答案：${esc(chosen)}</b><br><b>正確答案：${esc(right)}</b><br>${esc(item.explain)}</div></article>`;}).join('')}</section>`;
   }
   function reviewAttemptWrong(id){
     const attempt=getAttempts().find(x=>x.id===id);
@@ -567,7 +591,7 @@
   }
   function viewAttemptHistory(){
     const attempts=getAttempts().sort((a,b)=>b.completedAt-a.completedAt);
-    const list=attempts.length ? attempts.map(x=>{const wrong=x.answers.filter(a=>!a.correct).length; const day=new Intl.DateTimeFormat('zh-TW',{month:'numeric',day:'numeric'}).format(new Date(x.completedAt)); return `<button class="ps-attempt-row" onclick="PrivateSchool.viewAttempt('${x.id}')"><span><b>${day} ${timeLabel(x.completedAt)}</b><small>${x.answers.length} 題 · 對 ${x.answers.length-wrong}／錯 ${wrong}</small></span><strong>${x.score} 分　›</strong></button>`;}).join('') : '<p class="ps-note">近一年尚無完成的測驗紀錄。</p>';
+    const list=attempts.length ? attempts.map(x=>{const wrong=x.answers.filter(a=>!a.correct).length; const day=new Intl.DateTimeFormat('zh-TW',{month:'numeric',day:'numeric'}).format(new Date(x.completedAt)); return `<button class="ps-attempt-row" onclick="PrivateSchool.viewAttempt('${x.id}')"><span><b>${day} ${timeLabel(x.completedAt)}</b><small>${x.answers.length} 題 · 對 ${x.answers.length-wrong}／錯 ${wrong} · ${durationLabel(attemptDuration(x))}</small></span><strong>${x.score} 分　›</strong></button>`;}).join('') : '<p class="ps-note">近一年尚無完成的測驗紀錄。</p>';
     document.getElementById('ps-app').innerHTML=`<section class="ps-card"><header><button class="ps-back" onclick="PrivateSchool.home()">← 回設定</button><span>近一年考試紀錄</span><b>${attempts.length} 次</b></header><div class="ps-hero"><div>📅</div><h1>歷史考試紀錄</h1><p>保留最近一年；點選可查看全部題目、對錯與正解。</p></div>${list}</section>`;
   }
   function setStopVisible(visible){const button=document.getElementById('ps-stop-speech');if(button)button.hidden=!visible;}
@@ -620,6 +644,7 @@
   }
   function toggleAnswer(id){const el=document.getElementById('ps-a-'+id);if(el)el.hidden=!el.hidden;}
   function home(){
+    clearQuestionTimer();
     const wrong=getWrong(), weak=Object.keys(wrong).length;
     document.getElementById('ps-app').innerHTML=`<section class="ps-card"><header><button class="ps-back" onclick="PrivateSchool.close()">← 回首頁</button><span>嘉駿的私中專區</span><b>目標 90+</b></header><div class="ps-hero"><div>🎯</div><h1>私中入學英語衝刺</h1><p>六課題庫 · 不重複出題 · 針對錯題反覆加強</p></div><div class="ps-mode"><button class="${state.mode==='test'?'active':''}" onclick="PrivateSchool.setMode('test')">📝 直接考試</button><button class="${state.mode==='practice'?'active':''}" onclick="PrivateSchool.setMode('practice')">📖 範圍練習</button></div><h3>選擇測驗類型（可複選）</h3><div class="ps-types">${Object.entries(TYPES).map(([id,label])=>`<label class="${state.selected.has(id)?'chosen':''}"><input type="checkbox" ${state.selected.has(id)?'checked':''} onchange="PrivateSchool.type('${id}',this.checked)"><span>${({vocab:'🗂️',grammar:'🧩',cloze:'✍️',reading:'📖'})[id]}</span>${label}</label>`).join('')}</div><h3>選擇範圍</h3><div class="ps-lessons"><button class="${state.lessons.size===6?'active':''}" onclick="PrivateSchool.allLessons()">全部 Unit 1–6</button>${LESSONS.map((x,i)=>`<label class="${state.lessons.has(i)?'chosen':''}"><input type="checkbox" ${state.lessons.has(i)?'checked':''} onchange="PrivateSchool.lesson(${i},this.checked)">${x}</label>`).join('')}</div><div class="ps-ready"><span>${state.mode==='test'?'最多 ':'查看 '}<b>${state.mode==='test'?'20 題':'所選題目'}</b><small>${state.mode==='test'?'題庫不足 20 題時，會減少題數，絕不重複。':'可顯示答案、解析與英文朗讀。'}</small></span><button class="ps-primary" onclick="PrivateSchool.${state.mode==='test'?'start()':'practice()'}">${state.mode==='test'?'開始測驗':'開始練習'}</button></div><button class="ps-weak" onclick="PrivateSchool.review()">🔥 常犯錯題庫 <b>${weak}</b> 題</button><p class="ps-note">題庫依 Unit 1–6 的家庭、飲食、校園、日常、休閒、交通內容整理；Unit 7–12 加入後可直接擴充。</p></section>`;
   }
@@ -645,17 +670,18 @@
     if(!anchor) return;
     const attempts=getAttempts().filter(x=>sameLocalDay(x.completedAt)).sort((a,b)=>b.completedAt-a.completedAt);
     const list=attempts.length
-      ? attempts.map(x=>{const wrong=x.answers.filter(a=>!a.correct).length; return `<button class="ps-attempt-row" onclick="PrivateSchool.viewAttempt('${x.id}')"><span><b>${timeLabel(x.completedAt)}</b><small> ${x.answers.length} 題 · 對 ${x.answers.length-wrong}／錯 ${wrong}</small></span><strong>${x.score} 分　›</strong></button>`;}).join('')
+      ? attempts.map(x=>{const wrong=x.answers.filter(a=>!a.correct).length; return `<button class="ps-attempt-row" onclick="PrivateSchool.viewAttempt('${x.id}')"><span><b>${timeLabel(x.completedAt)}</b><small> ${x.answers.length} 題 · 對 ${x.answers.length-wrong}／錯 ${wrong} · ${durationLabel(attemptDuration(x))}</small></span><strong>${x.score} 分　›</strong></button>`;}).join('')
       : '<p style="margin:8px 0 0">今天尚未完成測驗；完成後會自動出現在這裡。</p>';
     const allCount=getAttempts().length;
     anchor.insertAdjacentHTML('afterend',`<section class="ps-attempts"><b>🗓️ 今日考試紀錄</b><p>點選任一時段可查看當次所有對題、錯題與正解。</p>${list}<button class="ps-answer" style="margin-top:10px" onclick="PrivateSchool.viewAttemptHistory()">📅 近一年全部紀錄（${allCount} 次）</button></section>`);
   }
   function open(){document.getElementById('ps-overlay').classList.add('open');home();}
-  function close(){stopSpeech();document.getElementById('ps-overlay').classList.remove('open');}
+  function close(){clearQuestionTimer();stopSpeech();document.getElementById('ps-overlay').classList.remove('open');}
   window.PrivateSchool={open,close,home,start,answer,next,review,reviewMastered,viewAttempt,reviewAttemptWrong,viewAttemptHistory,practice,speakItem,speakExplanation:id=>speakItem(id,'explanation'),stopSpeech,toggleAnswer,setMode:m=>{state.mode=m;home();},type:(x,on)=>{on?state.selected.add(x):state.selected.delete(x);home();},lesson:(x,on)=>{on?state.lessons.add(x):state.lessons.delete(x);home();},allLessons:()=>{state.lessons=new Set([0,1,2,3,4,5]);home();}};
   const style=`<style>
   #ps-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#172554,#4f46e5);padding:18px;overflow:auto;display:none;font-family:Segoe UI,'Microsoft JhengHei',sans-serif}#ps-overlay.open{display:block}.ps-card{max-width:720px;margin:0 auto 20px;background:#fff;border-radius:24px;padding:22px;box-shadow:0 20px 70px #0006}.ps-card header{display:flex;justify-content:space-between;align-items:center;color:#4338ca;font-weight:800;gap:8px}.ps-back{border:0;background:#eef2ff;color:#4338ca;border-radius:10px;padding:8px 10px;font-weight:700;cursor:pointer}.ps-hero{text-align:center;padding:18px 4px}.ps-hero div{font-size:3rem}.ps-hero h1{margin:6px 0;color:#1e1b4b}.ps-hero p,.ps-note,.ps-tip{color:#64748b;font-size:.85rem;line-height:1.5}.ps-card h3{font-size:.9rem;color:#475569;margin:18px 0 8px}.ps-types{display:grid;grid-template-columns:1fr 1fr;gap:9px}.ps-types label,.ps-lessons label{border:2px solid #e2e8f0;border-radius:12px;padding:11px;cursor:pointer;font-weight:700;color:#334155}.ps-types label.chosen,.ps-lessons label.chosen{border-color:#6366f1;background:#eef2ff;color:#3730a3}.ps-types input,.ps-lessons input{display:none}.ps-types span{margin-right:6px}.ps-lessons{display:flex;flex-wrap:wrap;gap:7px}.ps-lessons button{width:100%;border:0;border-radius:10px;padding:9px;background:#f1f5f9;color:#475569;font-weight:700;cursor:pointer}.ps-lessons button.active{background:#312e81;color:#fff}.ps-lessons label{font-size:.8rem;padding:8px}.ps-ready{display:flex;justify-content:space-between;align-items:center;margin-top:20px;background:#f8fafc;padding:13px;border-radius:14px;color:#334155}.ps-ready small{display:block;color:#64748b;font-size:.72rem;margin-top:3px}.ps-primary,.ps-secondary,.ps-weak{border:0;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer}.ps-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff}.ps-secondary{background:#e2e8f0;color:#334155;margin-left:8px}.ps-weak{width:100%;margin-top:10px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}.ps-mode{display:flex;gap:8px;margin:8px 0 18px}.ps-mode button{flex:1;border:2px solid #e2e8f0;border-radius:11px;padding:10px;background:#fff;color:#475569;font-weight:800;cursor:pointer}.ps-mode button.active{background:#4338ca;color:#fff;border-color:#4338ca}.ps-qtype{font-size:.76rem;color:#6366f1;font-weight:800;margin-top:18px}.ps-test h2,.ps-practice h2{font-size:1.2rem;line-height:1.5;color:#1e293b;margin:8px 0}.ps-question-row{display:flex;align-items:flex-start;gap:10px}.ps-question-row h2{flex:1}.ps-speak{flex:0 0 auto;border:0;background:#eef2ff;color:#4338ca;border-radius:10px;padding:8px;cursor:pointer;font-size:1.1rem}.ps-progress{height:7px;background:#e2e8f0;border-radius:8px;margin:14px 0}.ps-progress i{display:block;height:100%;background:#6366f1;border-radius:8px}.ps-passage{background:#f8fafc;border-left:4px solid #818cf8;padding:13px;line-height:1.7;color:#334155;font-size:.93rem}.ps-options{display:grid;gap:9px}.ps-options button{display:flex;text-align:left;align-items:center;gap:9px;border:2px solid #e2e8f0;background:#fff;border-radius:12px;padding:12px;cursor:pointer;font-size:.95rem}.ps-options button:hover{border-color:#818cf8}.ps-options b{background:#eef2ff;color:#4338ca;border-radius:7px;padding:3px 7px}.ps-options .ok{border-color:#22c55e;background:#f0fdf4}.ps-options .bad{border-color:#ef4444;background:#fef2f2}.ps-explain{margin-top:14px;padding:13px;border-radius:12px;line-height:1.55}.ps-explain.good{background:#f0fdf4;color:#166534}.ps-explain.wrong{background:#fff7ed;color:#9a3412}.ps-explain button{display:block;margin-top:9px;margin-left:auto;border:0;border-radius:9px;padding:8px 12px;background:#4338ca;color:#fff;font-weight:700;cursor:pointer}.ps-practice{border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin:12px 0}.ps-practice ol{padding-left:24px;color:#475569;line-height:1.65}.ps-answer{border:0;border-radius:9px;padding:8px 11px;background:#eef2ff;color:#4338ca;font-weight:700;cursor:pointer}.ps-answer-box{margin-top:9px;padding:10px;border-radius:9px;background:#f0fdf4;color:#166534;line-height:1.55}.ps-answer-speak{display:block;margin-top:9px;border:0;border-radius:8px;padding:7px 10px;background:#dcfce7;color:#166534;font-weight:800;cursor:pointer}.ps-attempt-ok{border-color:#86efac}.ps-attempt-bad{border-color:#fca5a5;background:#fffafa}.ps-correct-choice{font-weight:800;color:#15803d}.ps-attempts{margin-top:14px;padding:14px;border:1px solid #c7d2fe;border-radius:14px;background:#f8faff;color:#312e81}.ps-attempts p{margin:7px 0;font-size:.82rem;color:#64748b}.ps-attempt-row{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:8px;padding:10px;border:1px solid #dbeafe;border-radius:10px;background:#fff;color:#312e81;text-align:left;cursor:pointer}.ps-attempt-row small{display:block;margin-top:3px;color:#64748b}.ps-result{text-align:center;padding:40px 24px}.ps-result h1{font-size:3.2rem;color:#4f46e5;margin:4px}.ps-result h2{font-size:1.1rem;color:#334155}.ps-medal{font-size:4rem}.ps-summary{margin:18px 0;padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412}.private-zone{margin:14px 0;background:linear-gradient(135deg,#1e1b4b,#4f46e5);border-radius:16px;padding:14px;color:#fff;box-shadow:0 8px 20px #4338ca40}.private-zone div{font-weight:800;font-size:1rem}.private-zone p{font-size:.75rem;margin:4px 0 10px;color:#e0e7ff}.private-zone button{width:100%;border:0;border-radius:10px;padding:10px;background:#fff;color:#3730a3;font-weight:800;cursor:pointer}@media(max-width:480px){#ps-overlay{padding:9px}.ps-card{padding:16px;border-radius:18px}.ps-types{grid-template-columns:1fr}.ps-ready{align-items:flex-start;gap:12px}.ps-ready .ps-primary{white-space:nowrap}}
   #ps-stop-speech{position:fixed;right:22px;bottom:22px;z-index:10001;border:0;border-radius:999px;padding:12px 16px;background:#dc2626;color:#fff;font-weight:900;box-shadow:0 6px 18px #7f1d1d88;cursor:pointer;font-size:.9rem}
+  .ps-timer{float:right;background:#fff7ed;color:#c2410c;border-radius:999px;padding:4px 8px;font-size:.78rem}
   </style>`;
   document.body.insertAdjacentHTML('beforeend',style+'<div id="ps-overlay"><button id="ps-stop-speech" hidden onclick="PrivateSchool.stopSpeech()">⏹ STOP 停止朗讀</button><main id="ps-app"></main></div>');
   // 私中入口由首頁的兩大專區版面提供，不再插入國小專區的設定頁。
