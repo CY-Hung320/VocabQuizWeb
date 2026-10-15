@@ -185,8 +185,16 @@
       ? vocabWords[wordIndex][0]
       : (item.passage?item.passage+' ': '')+item.stem+'. '+item.opts.join(', ');
     const voice=new SpeechSynthesisUtterance(text);
+    const voices=speechSynthesis.getVoices();
+    // 優先自然的美式英文聲音，再選 Microsoft／Google 美式英文，避免使用系統預設的非英文聲音。
+    const preferred = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Natural|Online|Ava|Jenny|Aria|Guy|Andrew|Emma|Brian)/i.test(v.name))
+      || voices.find(v => /en[-_]US/i.test(v.lang) && /Google US English|Microsoft/i.test(v.name))
+      || voices.find(v => /en[-_]US/i.test(v.lang));
+    if(preferred) voice.voice=preferred;
     voice.lang='en-US';
-    voice.rate=.82;
+    voice.rate=item.type==='vocab' ? .68 : .78;
+    voice.pitch=1;
+    voice.volume=1;
     speechSynthesis.speak(voice);
   }
   function practice(){
