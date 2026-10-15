@@ -186,14 +186,15 @@
       : (item.passage?item.passage+' ': '')+item.stem+'. '+item.opts.join(', ');
     const voice=new SpeechSynthesisUtterance(text);
     const voices=speechSynthesis.getVoices();
-    // 優先自然的美式英文聲音，再選 Microsoft／Google 美式英文，避免使用系統預設的非英文聲音。
-    const preferred = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Natural|Online|Ava|Jenny|Aria|Guy|Andrew|Emma|Brian)/i.test(v.name))
-      || voices.find(v => /en[-_]US/i.test(v.lang) && /Google US English|Microsoft/i.test(v.name))
+    // 優先年輕、有活力的美式女聲；Windows 的 Natural／Online 聲音通常最清楚。
+    const preferred = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria)/i.test(v.name))
+      || voices.find(v => /en[-_]US/i.test(v.lang) && /(Jenny|Ava|Aria|Zira|Samantha|Google US English)/i.test(v.name))
+      || voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft/i.test(v.name))
       || voices.find(v => /en[-_]US/i.test(v.lang));
     if(preferred) voice.voice=preferred;
     voice.lang='en-US';
-    voice.rate=item.type==='vocab' ? .68 : .78;
-    voice.pitch=1;
+    voice.rate=item.type==='vocab' ? .76 : .84;
+    voice.pitch=1.12;
     voice.volume=1;
     speechSynthesis.speak(voice);
   }
