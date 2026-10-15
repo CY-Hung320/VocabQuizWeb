@@ -34,32 +34,145 @@
     return q('v'+i,'vocab',w[2],`「${w[0]}」的中文意思是？`,choices,0,`${w[0]} = ${w[1]}。`);
   });
 
-  const grammar = [
-    q('g1','grammar',0,'Hi, my name ___ Ben.',['am','is','are','be'],0,'主詞 I 要搭配 am。'),
-    q('g2','grammar',0,'My father ___ an engineer.',['am','is','are','be'],1,'單數主詞 My father 要用 is。'),
-    q('g3','grammar',0,'Tom is my brother. ___ likes basketball.',['She','Her','He','Him'],2,'Tom 是男生，作主詞用 He。'),
-    q('g4','grammar',0,'How ___ you?',['am','is','are','be'],2,'主詞 you 要搭配 are。'),
-    q('g5','grammar',0,'We often have dinner ___ every evening.',['together','friendly','family','live'],0,'have dinner together 表示一起吃晚餐。'),
-    q('g6','grammar',1,"I’m not hungry, so I don’t want ___ dessert.",['a','some','much','any'],3,'否定句中通常用 any。'),
-    q('g7','grammar',1,'A: Do you like the juice? B: Yes, ___ tastes great!',['It','They','These','Those'],0,'juice 是單數，用 It 指代。'),
-    q('g8','grammar',1,'There ___ any milk left.',['isn’t','aren’t','don’t','doesn’t'],0,'milk 不可數，搭配 is；否定為 isn’t。'),
-    q('g9','grammar',1,'Would you like ___ soup?',['some','many','a','an'],0,'提出邀請時可用 some。'),
-    q('g10','grammar',2,'___ a library in your school?',['There is','Are there','Is there','There are'],2,'詢問單數地點用 Is there ...?'),
-    q('g11','grammar',2,'The books are ___ the table, not under it.',['on','in','under','next'],0,'物品在桌面上用 on。'),
-    q('g12','grammar',2,'The library is ___ the gym.',['under','behind','in','next to'],3,'next to 表示在旁邊。'),
-    q('g13','grammar',2,'We ___ eat lunch in the classroom when it rains.',['sometimes','never','always','seldom'],0,'下雨時「有時」在教室吃飯最符合語意。'),
-    q('g14','grammar',3,'He ___ eats breakfast at home.',['always','is always','always is','am always'],0,'頻率副詞放在一般動詞前。'),
-    q('g15','grammar',3,'I ___ go to the library after school.',['am','am always','always am','always'],3,'一般動詞 go 前放 always。'),
-    q('g16','grammar',3,'Our principal is ___ busy on Fridays because there are fewer meetings.',['sometimes','usually','always','seldom'],3,'因為會議較少，校長很少忙，選 seldom。'),
-    q('g17','grammar',3,'It is late, ___ I run to school.',['and','but','so','because'],2,'前因後果，用 so。'),
-    q('g18','grammar',4,'Peter enjoys ___ the guitar.',['play','plays','playing','to playing'],2,'enjoy 後接 V-ing。'),
-    q('g19','grammar',4,'Amy ___ pictures every weekend.',['draw','draws','drawing','to draw'],1,'Amy 是第三人稱單數，現在式動詞加 s。'),
-    q('g20','grammar',4,'Peter and Amy like music because it ___ them relax.',['help','helps','helping','to help'],1,'it 為單數主詞，動詞用 helps。'),
-    q('g21','grammar',5,'The driver stopped ___ the traffic light.',['at','in','on','by'],0,'at the traffic light 是固定用法。'),
-    q('g22','grammar',5,'Turn right ___ the corner.',['on','in','to','at'],3,'at the corner 表示在轉角處。'),
-    q('g23','grammar',5,'Amy gets ___ the train quickly.',['in','on','at','by'],1,'搭乘火車用 get on the train。'),
-    q('g24','grammar',5,'The train will leave ___ ten minutes.',['on','at','in','for'],2,'in + 一段時間表示「在…之後」。')
-  ];
+  // 依掃描題庫各 Unit 的「文法重點／文法測驗」頁重建；每單元固定 20 題。
+  // 題目主題不跨 Unit，後段是以同一文法重點、該單元字彙延伸的不同情境。
+  const grammar = [];
+  const addGrammar = (lesson, rows) => rows.forEach((row, i) =>
+    grammar.push(q(`g${lesson + 1}-${i + 1}`, 'grammar', lesson, ...row))
+  );
+  const be = ['am','is','are','be'];
+  addGrammar(0, [
+    ['I ___ a student in Green Junior High School.',be,0,'主詞 I 要搭配 am。'],
+    ['My parents ___ both doctors.',be,2,'複數主詞 parents 要搭配 are。'],
+    ['___ your brother a teacher?',['Does','Do','Are','Is'],3,'單數名詞 brother 搭配 Is。'],
+    ['My sister’s name ___ Amy.',be,1,'name 是單數，搭配 is。'],
+    ['This is ___ book.',['my','I','me','mine'],0,'名詞 book 前使用所有格 my。'],
+    ['That man is ___ father.',['Tom','Toms’','Toms','Tom’s'],3,'表示「Tom 的」要用 Tom’s。'],
+    ['___ is your English teacher?',['What','Where','Who','How'],2,'詢問人使用 Who。'],
+    ['___ are you from?',['How','What','Where','Who'],2,'詢問地點使用 Where。'],
+    ['___ is your favorite subject?',['What','Who','How','Where'],0,'詢問事物使用 What。'],
+    ['My cousin and I ___ in the same town.',['lives','live','living','to live'],1,'My cousin and I 是複數主詞，使用原形 live。'],
+    ['My father ___ an engineer.',be,1,'father 是單數主詞，搭配 is。'],
+    ['___ name is Kevin.',['I','Me','My','Mine'],2,'name 前要用所有格 My。'],
+    ['Anna is my cousin. ___ is very friendly.',['He','She','Her','Hers'],1,'Anna 是女生，作主詞用 She。'],
+    ['Tom and Ben are brothers. ___ are hard-working.',['We','You','They','He'],2,'Tom and Ben 用 They 指代。'],
+    ['How old ___ your sister?',['am','is','are','be'],1,'your sister 是單數，使用 is。'],
+    ['What ___ your parents’ names?',['am','is','are','be'],2,'names 是複數，使用 are。'],
+    ['My uncle ___ in Tainan.',be,1,'uncle 是單數，使用 is。'],
+    ['___ you and your cousin friends?',['Am','Is','Are','Be'],2,'you and your cousin 是複數，使用 Are。'],
+    ['My mother and I ___ dinner together.', ['has','have','having','to have'],1,'My mother and I 是複數主詞，使用 have。'],
+    ['___ favorite hobby is drawing.', ['She','Her','Hers','She’s'],1,'hobby 前需要所有格 Her。']
+  ]);
+  addGrammar(1, [
+    ['There ___ a playground in our school.',['is','are','am','be'],0,'單數名詞 playground 搭配 There is。'],
+    ['There ___ many students in our class.',['is','are','am','be'],1,'複數名詞 students 搭配 There are。'],
+    ['The pencil is ___ the pencil case.',['in','on','under','behind'],0,'物品在盒子裡面使用 in。'],
+    ['The book is ___ the table.',['in','on','under','behind'],2,'物品在桌子下方使用 under。'],
+    ['The library is ___ the gym.',['behind','in','on','at'],0,'掃描題庫的例句：library is behind the gym。'],
+    ['The playground is ___ the school building.',['next to','under','in','at'],0,'next to 表示在旁邊。'],
+    ['I am ___ early for class.',['always','always am','am always','is always'],2,'be 動詞後面放頻率副詞：am always。'],
+    ['He ___ does his homework after dinner.',['usually','is usually','usually is','does usually'],0,'一般動詞前放頻率副詞。'],
+    ['We ___ eat lunch near the library.',['sometimes','are sometimes','sometimes are','is sometimes'],0,'一般動詞 eat 前放 sometimes。'],
+    ['She ___ forgets her homework.',['seldom','is seldom','seldom is','does seldom'],0,'一般動詞 forgets 前放 seldom。'],
+    ['They are ___ late for school.',['never','never are','are never','do never'],2,'be 動詞後面放 never。'],
+    ['___ there a science classroom?',['Are','Is','Do','Does'],1,'單數 classroom 的問句使用 Is there。'],
+    ['___ there any desks in the classroom?',['Is','Are','Do','Does'],1,'複數 desks 的問句使用 Are there。'],
+    ['There ___ not a test today.',['is','are','do','does'],0,'單數 test 的否定為 There is not。'],
+    ['The principal’s office is ___ the library and the gym.',['between','under','on','at'],0,'兩者之間使用 between。'],
+    ['My uniform is ___ the chair.',['on','in','behind','next'],0,'在椅子上使用 on。'],
+    ['The teacher is ___ the classroom.',['in','on','under','between'],0,'在教室裡使用 in。'],
+    ['My classmate is ___ late for school.',['never','never is','is never','does never'],2,'be 動詞 is 後面放 never。'],
+    ['We ___ have PE on Fridays.',['usually','are usually','usually are','is usually'],0,'一般動詞 have 前放 usually。'],
+    ['There ___ two libraries near the school.',['is','are','am','be'],1,'two libraries 是複數，使用 are。']
+  ]);
+  addGrammar(2, [
+    ['I ___ up at six every day.',['get','gets','getting','to get'],0,'I 搭配原形動詞 get。'],
+    ['She ___ to school by bus.',['go','goes','going','to go'],1,'She 為第三人稱單數，go 要加 es。'],
+    ['He ___ his homework every day.',['do','does','doing','to do'],1,'He 為第三人稱單數，do 變 does。'],
+    ['I ___ eat breakfast at home.',['don’t','doesn’t','am not','isn’t'],0,'I 的一般現在式否定用 don’t。'],
+    ['She ___ like milk.',['don’t','doesn’t','isn’t','aren’t'],1,'She 的一般現在式否定用 doesn’t。'],
+    ['___ you get up early every day?',['Do','Does','Are','Is'],0,'you 的一般現在式問句用 Do。'],
+    ['___ he watch TV after dinner?',['Do','Does','Are','Is'],1,'he 的一般現在式問句用 Does。'],
+    ['Does she ___ TV after dinner?',['watches','watch','watching','to watch'],1,'Does 後面接原形動詞 watch。'],
+    ['My alarm clock ___ at six every morning.',['ring','rings','ringing','to ring'],1,'alarm clock 是單數，動詞加 s。'],
+    ['My dad ___ sandwiches for breakfast.',['make','makes','making','to make'],1,'dad 是第三人稱單數，使用 makes。'],
+    ['I read books ___ night.',['in','on','at','by'],2,'固定用法：at night。'],
+    ['She takes a shower ___ the morning.',['at','on','in','by'],2,'固定用法：in the morning。'],
+    ['They play basketball ___ school.',['after','at','in','on'],0,'固定用法：after school。'],
+    ['We visit our grandparents ___ weekends.',['in','at','on','by'],2,'固定用法：on weekends。'],
+    ['I ___ do my homework after dinner.',['usually','am usually','usually am','is usually'],0,'一般動詞 do 前放 usually。'],
+    ['He ___ goes to bed late.',['never','is never','never is','does never'],0,'一般動詞 goes 前放 never。'],
+    ['My sister ___ breakfast before school.',['eat','eats','eating','to eat'],1,'第三人稱單數 sister 使用 eats。'],
+    ['We ___ exercise on weekends.',['do','does','doing','to do'],0,'We 搭配原形動詞 do。'],
+    ['___ your brother study at night?',['Do','Does','Is','Are'],1,'your brother 是單數，問句用 Does。'],
+    ['My friends ___ snacks after school.',['eat','eats','eating','to eat'],0,'friends 是複數，使用原形 eat。']
+  ]);
+  addGrammar(3, [
+    ['I eat ___ apple every day.',['a','an','some','any'],1,'apple 發音以母音開頭，使用 an。'],
+    ['I drink ___ milk in the morning.',['a','an','some','any'],2,'milk 是不可數名詞，肯定句可用 some。'],
+    ['Rice is a(n) ___ noun.',['countable','uncountable','plural','singular'],1,'rice 是不可數名詞。'],
+    ['Apples are ___ nouns.',['countable','uncountable','no','not'],0,'apples 可以計數，是可數名詞。'],
+    ['I have ___ juice.',['some','any','an','many'],0,'肯定句使用 some。'],
+    ['I don’t have ___ rice.',['some','any','a','an'],1,'否定句通常使用 any。'],
+    ['Do you have ___ milk?',['some','any','a','an'],1,'一般疑問句通常使用 any。'],
+    ['Would you like ___ coffee?',['some','any','a','an'],0,'提出邀請時常使用 some。'],
+    ['I would like ___ sandwich.',['a','an','some','any'],0,'sandwich 是單數可數名詞，使用 a。'],
+    ['She would like ___ orange.',['a','an','some','any'],1,'orange 發音以母音開頭，使用 an。'],
+    ['There ___ some milk in the glass.',['is','are','am','be'],0,'milk 是不可數名詞，搭配 is。'],
+    ['There ___ some noodles on the table.',['is','are','am','be'],1,'noodles 為複數，搭配 are。'],
+    ['How ___ juice do you want?',['many','much','any','some'],1,'juice 是不可數名詞，使用 How much。'],
+    ['How ___ apples do you want?',['many','much','any','some'],0,'apples 是可數複數，使用 How many。'],
+    ['The soup ___ delicious.',['taste','tastes','tasting','to taste'],1,'soup 是單數，動詞使用 tastes。'],
+    ['My parents ___ at a restaurant on Sundays.',['eat','eats','eating','to eat'],0,'parents 是複數，使用 eat。'],
+    ['The waiter ___ us the menu.',['give','gives','giving','to give'],1,'waiter 是第三人稱單數，使用 gives。'],
+    ['I am hungry, so I ___ some noodles.',['want','wants','wanting','to wanting'],0,'I 搭配原形動詞 want。'],
+    ['She ___ not want dessert.',['do','does','is','are'],1,'she 的否定句使用 does not。'],
+    ['___ you like some salad?',['Would','Do','Are','Is'],0,'禮貌邀請用 Would you like ...?']
+  ]);
+  addGrammar(4, [
+    ['I like ___ books in my free time.',['read','reading','to reading','reads'],1,'like 後面可接 V-ing，題庫指定 reading。'],
+    ['___ pictures is her favorite hobby.',['Draw','To draw','Drawing','Draws'],2,'動名詞 Drawing 可作主詞。'],
+    ['He can’t ___ the guitar very well.',['playing','to play','plays','play'],3,'can’t 後面接原形動詞。'],
+    ['My sister enjoys ___ to music after dinner.',['listen','listening','listens','to listen'],1,'enjoy 後面接 V-ing。'],
+    ['We ___ swim in the river because it’s dangerous.',['can’t','aren’t','don’t','didn’t'],0,'表示能力／禁止，使用 can’t。'],
+    ['He loves ___ photos when he travels.',['take','takes','taking','to taking'],2,'love 後面可接 V-ing，題庫指定 taking。'],
+    ['I play basketball ___ a week.',['once','one time','one times','once time'],0,'頻率用 once a week。'],
+    ['Can you ___ English songs?',['singing','sings','to sing','sing'],3,'Can 後面接原形動詞。'],
+    ['She goes jogging ___ every month.',['two','twice','double','second'],1,'每月兩次用 twice。'],
+    ['A: Do you like playing basketball? B: Yes, I ___.',['am','can','do','does'],2,'Do you...? 的肯定簡答是 Yes, I do.'],
+    ['My friends and I ___ shopping on Sundays.',['go','goes','going','to go'],0,'My friends and I 是複數，使用 go。'],
+    ['I can’t play the piano, but I ___ play the guitar.',['may','should','can','must'],2,'表示能力使用 can。'],
+    ['Amy ___ music every evening.',['listen to','listens to','listening to','to listen to'],1,'Amy 是第三人稱單數，使用 listens to。'],
+    ['Peter ___ a movie with his family on weekends.',['watch','watches','watching','to watch'],1,'Peter 是第三人稱單數，使用 watches。'],
+    ['They enjoy ___ at the concert.',['dance','dancing','dances','to dancing'],1,'enjoy 後面接 V-ing。'],
+    ['My hobby is ___ stamps.',['collect','collecting','collects','to collecting'],1,'be 動詞後用動名詞說明嗜好。'],
+    ['___ she draw pictures after school?',['Do','Does','Is','Are'],1,'she 的一般現在式問句使用 Does。'],
+    ['We don’t ___ video games every day.',['plays','play','playing','to play'],1,'don’t 後面接原形動詞 play。'],
+    ['He ___ relaxes by listening to music.',['usually','is usually','usually is','does usually'],0,'一般動詞 relaxes 前放 usually。'],
+    ['Can your sister ___?',['swims','swimming','swim','to swimming'],2,'Can 後面接原形動詞 swim。']
+  ]);
+  addGrammar(5, [
+    ['The bank is ___ the post office.',['next to','under','at','on'],0,'相鄰的位置使用 next to。'],
+    ['The park is ___ the school.',['in','at','across from','between'],2,'在對面使用 across from。'],
+    ['There is a bus stop ___ the corner.',['under','on','between','at'],3,'固定用法：at the corner。'],
+    ['Walk ___ the river and you’ll find a bridge.',['across','on','under','along'],3,'沿著河走使用 along。'],
+    ['Don’t walk ___ the road. It’s dangerous.',['between','across','at','behind'],1,'穿越馬路使用 across。'],
+    ['___ straight and turn right at the second corner.',['Be','Turn','Go','Walks'],2,'祈使句用原形動詞 Go。'],
+    ['___ left at the traffic light, please.',['Turn','To turn','Going','Turns'],0,'祈使句用原形動詞 Turn。'],
+    ['___ careful when you cross the street.',['Turn','Be','Go','Walk'],1,'Be careful 是祈使句。'],
+    ['Excuse me, ___ can I get to the museum?',['when','where','how','who'],2,'詢問方式用 How。'],
+    ['Please ___ the map to find the bus station.',['see','look at','watch','look for'],1,'看地圖使用 look at。'],
+    ['Go ___ and then turn right at the traffic light.',['up','down','straight','near'],2,'直走使用 go straight。'],
+    ['The bookstore is ___ the post office and the bank.',['behind','next to','across','between'],3,'兩者之間使用 between。'],
+    ['The school is ___ the park, so let’s walk there.',['near','far','behind','across'],0,'距離近使用 near。'],
+    ['How can I ___ to the train station from here?',['go','get','come','take'],1,'到某地使用 get to。'],
+    ['It takes only five ___ to get to the hospital by car.',['miles','hours','minutes','days'],2,'五分鐘使用 five minutes。'],
+    ['The driver stops ___ the red traffic light.',['at','in','on','by'],0,'固定搭配 at the traffic light。'],
+    ['We get ___ the MRT at the next station.',['in','on','at','by'],1,'搭乘交通工具使用 get on。'],
+    ['The taxi will arrive ___ ten minutes.',['on','at','in','for'],2,'in + 一段時間表示「在…之後」。'],
+    ['The train station is ___ from my home.',['far','left','right','next'],0,'距離遠使用 far。'],
+    ['___ the road carefully at the traffic light.',['Cross','Crosses','Crossing','To cross'],0,'祈使句以原形動詞 Cross 開頭。']
+  ]);
 
   // 為每個單字增加三種新題型，讓考試不會反覆只出「英文選中文」的舊題。
   vocabWords.forEach((word,index)=>{
@@ -78,11 +191,6 @@
     item.opts.sort(() => Math.random() - .5);
     item.answer = item.opts.indexOf(correct);
   });
-
-  // 舊版建立題目時把 Unit 2–4 的題材順序放錯；此處依正式目錄重新標示。
-  grammar.slice(5,9).forEach(x => x.lesson = 3);   // 食物與餐廳
-  grammar.slice(9,13).forEach(x => x.lesson = 1);  // 學校生活與科目
-  grammar.slice(13,17).forEach(x => x.lesson = 2); // 日常作息與習慣
 
   const cloze = [
     q('c1','cloze',0,'Ben ___ twelve years old.',['am','is','are','be'],1,'Ben 是單數，使用 is。'),
