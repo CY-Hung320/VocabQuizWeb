@@ -3,14 +3,16 @@
   'use strict';
   const KEY = 'private_school_wrong_v1';
   const TYPES = { vocab:'字彙測驗', grammar:'文法測驗', cloze:'克漏字測驗', reading:'閱讀測驗' };
-  const LESSONS = ['Unit 1 家庭生活','Unit 2 飲食與餐廳','Unit 3 校園生活','Unit 4 日常活動','Unit 5 興趣與休閒','Unit 6 交通與路線'];
+  // 依題庫目錄順序：自我介紹與家庭、學校生活、日常作息、食物餐廳、嗜好、交通問路。
+  const LESSONS = ['Unit 1 自我介紹與家庭','Unit 2 學校生活與科目','Unit 3 日常作息與習慣','Unit 4 食物與餐廳','Unit 5 嗜好與休閒時光','Unit 6 交通與問路'];
   const q = (id,type,lesson,stem,opts,answer,explain,passage='') => ({id,type,lesson,stem,opts,answer,explain,passage});
 
   const vocabWords = [
-    ['family','家人',0],['father','父親',0],['mother','母親',0],['brother','兄弟',0],['sister','姊妹',0],['together','一起',0],
-    ['restaurant','餐廳',1],['waiter','男服務生',1],['menu','菜單',1],['dessert','甜點',1],['hungry','飢餓的',1],['full','飽的',1],
-    ['library','圖書館',2],['principal','校長',2],['playground','操場',2],['classmate','同學',2],['gym','體育館',2],['break time','下課時間',2],
-    ['homework','作業',3],['breakfast','早餐',3],['always','總是',3],['sometimes','有時',3],['seldom','很少',3],['because','因為',3],
+    // Unit 1 字彙 p.3–p.5：完整 20 字，不再只顯示 6 題。
+    ['aunt','姑姑／阿姨',0],['brother','兄弟',0],['cousin','堂（表）兄弟姊妹',0],['family','家庭',0],['father','父親',0],['favorite','最喜歡的',0],['friend','朋友',0],['friendly','友善的',0],['hard-working','勤勞的',0],['hobby','嗜好',0],['kind','和善的',0],['live','居住',0],['loving','有愛心的／慈愛的',0],['mother','母親',0],['name','名字',0],['sister','姊妹',0],['student','學生',0],['together','一起',0],['twelve','十二／十二歲',0],['uncle','叔叔／舅舅',0],
+    ['restaurant','餐廳',3],['waiter','男服務生',3],['menu','菜單',3],['dessert','甜點',3],['hungry','飢餓的',3],['full','飽的',3],
+    ['library','圖書館',1],['principal','校長',1],['playground','操場',1],['classmate','同學',1],['gym','體育館',1],['break time','下課時間',1],
+    ['homework','作業',2],['breakfast','早餐',2],['always','總是',2],['sometimes','有時',2],['seldom','很少',2],['because','因為',2],
     ['guitar','吉他',4],['piano','鋼琴',4],['draw pictures','畫畫',4],['relax','放鬆',4],['practice','練習',4],['leisure time','休閒時間',4],
     ['taxi','計程車',5],['traffic light','紅綠燈',5],['corner','轉角',5],['platform','月台',5],['ticket','車票',5],['map','地圖',5]
   ];
@@ -48,6 +50,11 @@
     q('g24','grammar',5,'The train will leave ___ ten minutes.',['on','at','in','for'],2,'in + 一段時間表示「在…之後」。')
   ];
 
+  // 舊版建立題目時把 Unit 2–4 的題材順序放錯；此處依正式目錄重新標示。
+  grammar.slice(5,9).forEach(x => x.lesson = 3);   // 食物與餐廳
+  grammar.slice(9,13).forEach(x => x.lesson = 1);  // 學校生活與科目
+  grammar.slice(13,17).forEach(x => x.lesson = 2); // 日常作息與習慣
+
   const cloze = [
     q('c1','cloze',0,'Ben ___ twelve years old.',['am','is','are','be'],1,'Ben 是單數，使用 is。'),
     q('c2','cloze',0,'My father is an engineer, ___ my mother is a teacher.',['and','but','so','because'],0,'兩個資訊並列用 and。'),
@@ -74,6 +81,11 @@
     q('c23','cloze',5,'Then he drove ___ the park.',['across','past','between','through'],1,'經過某地用 drive past。'),
     q('c24','cloze',5,'Amy looks at the ___ to find the right platform.',['menu','map','dessert','library'],1,'找月台要看地圖 map。')
   ];
+
+  // 同步調整克漏字的 Unit 標記，讓篩選單位與題庫目錄一致。
+  cloze.slice(4,8).forEach(x => x.lesson = 3);   // 食物與餐廳
+  cloze.slice(8,12).forEach(x => x.lesson = 1);  // 學校生活與科目
+  cloze.slice(12,16).forEach(x => x.lesson = 2); // 日常作息與習慣
 
   const passages = [
     [0,'Ben lives in Taichung with his family. His father is an engineer, and his mother is a teacher. Ben has one brother, Tom. Tom likes playing basketball. The family often has dinner together every evening.',[
@@ -107,6 +119,10 @@
       ['What does Amy look at?',['A menu','A map','A story','A guitar'],1,'她看地圖找月台。'],
       ['What does Amy do after buying a ticket?',['Gets on the train','Goes home','Eats lunch','Calls her father'],0,'買票後上火車。']]]
   ];
+  // 閱讀篇章也依同一份目錄的 Unit 2、3、4 順序排列。
+  passages[1][0] = 3; // 食物與餐廳
+  passages[2][0] = 1; // 學校生活與科目
+  passages[3][0] = 2; // 日常作息與習慣
   const reading = passages.flatMap((p,pi) => p[2].map((r,ri) => q(`r${pi}-${ri}`,'reading',p[0],r[0],r[1],r[2],r[3],p[1])));
   const BANK = [...vocab,...grammar,...cloze,...reading];
 
