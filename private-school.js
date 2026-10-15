@@ -2,6 +2,8 @@
 (() => {
   'use strict';
   const KEY = 'private_school_wrong_v1';
+  const MASTERED_KEY = 'private_school_mastered_v1';
+  const HISTORY_KEY = 'private_school_recent_questions_v1';
   const TYPES = { vocab:'字彙測驗', grammar:'文法測驗', cloze:'克漏字測驗', reading:'閱讀測驗' };
   // 依題庫目錄順序：自我介紹與家庭、學校生活、日常作息、食物餐廳、嗜好、交通問路。
   const LESSONS = ['Unit 1 自我介紹與家庭','Unit 2 學校生活與科目','Unit 3 日常作息與習慣','Unit 4 食物與餐廳','Unit 5 嗜好與休閒時光','Unit 6 交通與問路'];
@@ -49,6 +51,17 @@
     q('g23','grammar',5,'Amy gets ___ the train quickly.',['in','on','at','by'],1,'搭乘火車用 get on the train。'),
     q('g24','grammar',5,'The train will leave ___ ten minutes.',['on','at','in','for'],2,'in + 一段時間表示「在…之後」。')
   ];
+
+  // 為每個單字增加三種新題型，讓考試不會反覆只出「英文選中文」的舊題。
+  vocabWords.forEach((word,index)=>{
+    const sameUnit=vocabWords.filter(w=>w[2]===word[2]&&w[0]!==word[0]).map(w=>w[0]);
+    const choices=[word[0],...Array.from({length:3},(_,i)=>sameUnit[(index+i)%sameUnit.length])];
+    vocab.push(
+      q(`vx1-${index}`,'vocab',word[2],`「${word[1]}」對應的英文單字是？`,[...choices],0,`${word[0]} = ${word[1]}。`),
+      q(`vx2-${index}`,'vocab',word[2],`Which word means “${word[1]}”?`,[...choices],0,`${word[0]} = ${word[1]}。`),
+      q(`vx3-${index}`,'vocab',word[2],`Complete the vocabulary note: ___ = “${word[1]}”.`,[...choices],0,`${word[0]} = ${word[1]}。`)
+    );
+  });
 
   // 每題正解位置隨機，避免所有單字題的答案都固定在第一個選項。
   vocab.forEach(item => {
@@ -174,10 +187,21 @@
   const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const getWrong = () => { try { return JSON.parse(localStorage.getItem(KEY)||'{}'); } catch { return {}; } };
   const saveWrong = x => localStorage.setItem(KEY,JSON.stringify(x));
+  const getMastered = () => { try { return JSON.parse(localStorage.getItem(MASTERED_KEY)||'{}'); } catch { return {}; } };
+  const saveMastered = x => localStorage.setItem(MASTERED_KEY,JSON.stringify(x));
+  const getHistory = () => { try { const x=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); return Array.isArray(x)?x:[]; } catch { return []; } };
+  const saveHistory = x => localStorage.setItem(HISTORY_KEY,JSON.stringify(x));
   const shuffle = a => [...a].sort(()=>Math.random()-.5);
   function choose(pool,n) {
     const wrong=getWrong();
-    return [...pool].sort((a,b)=>(wrong[b.id]?.count||0)-(wrong[a.id]?.count||0)||Math.random()-.5).slice(0,n);
+    const history=getHistory();
+    return [...pool].sort((a,b)=>{
+      const wrongFirst=(wrong[b.id]?.count||0)-(wrong[a.id]?.count||0);
+      if(wrongFirst) return wrongFirst; // 錯題永遠優先
+      const aSeen=history.includes(a.id), bSeen=history.includes(b.id);
+      if(aSeen!==bSeen) return aSeen?1:-1; // 非錯題時優先沒考過的題目
+      return Math.random()-.5;
+    }).slice(0,n);
   }
   function start() {
     const types=[...state.selected];
@@ -189,7 +213,11 @@
     let qs=[];
     types.forEach((t,i)=>qs.push(...choose(pool.filter(x=>x.type===t),per+(i<remainder?1:0))));
     if(qs.length<target) qs.push(...choose(pool.filter(x=>!qs.some(y=>y.id===x.id)),target-qs.length));
-    state.quiz=shuffle(qs).slice(0,target); state.index=0; state.answers=[]; renderQuestion();
+    state.quiz=shuffle(qs).slice(0,target);
+    const ids=state.quiz.map(item=>item.id);
+    const recent=getHistory().filter(id=>!ids.includes(id)).concat(ids).slice(-160);
+    saveHistory(recent);
+    state.index=0; state.answers=[]; renderQuestion();
   }
   function renderQuestion() {
     const item=state.quiz[state.index];
@@ -211,7 +239,39 @@
     const score=Math.round(correct/state.quiz.length*100), weak=Object.keys(wrong).length;
     document.getElementById('ps-app').innerHTML=`<section class="ps-card ps-result"><div class="ps-medal">${score>=90?'🏆':score>=70?'💪':'📚'}</div><h1>${score} 分</h1><p>答對 ${correct} / ${state.quiz.length} 題</p><h2>${score>=90?'達標！維持節奏，開始錯題複習。':score>=70?'快接近 90 分了，先把錯題練熟。':'先從常犯錯題庫開始，反覆練習最有效。'}</h2><div class="ps-summary">目前累積 <b>${weak}</b> 題常錯題；答對一次會降低它的出現權重。</div><button class="ps-primary" onclick="PrivateSchool.review()">常犯錯題庫</button><button class="ps-secondary" onclick="PrivateSchool.home()">回私中專區</button></section>`;
   }
+  // 覆寫成「連對 5 次才畢業」的錯題規則；中途錯一次就重新累積。
+  function finish(){
+    const wrong=getWrong(), mastered=getMastered();
+    let correct=0;
+    state.answers.forEach(a=>{
+      const item=BANK.find(x=>x.id===a.id);
+      if(!item) return;
+      if(a.correct){
+        correct++;
+        if(wrong[a.id]){
+          wrong[a.id].streak=(wrong[a.id].streak||0)+1;
+          if(wrong[a.id].streak>=5){
+            mastered[a.id]={count:wrong[a.id].count||1, masteredAt:Date.now(), type:item.type, lesson:item.lesson};
+            delete wrong[a.id];
+          }
+        }
+      }else{
+        const old=wrong[a.id]||mastered[a.id]||{};
+        delete mastered[a.id];
+        wrong[a.id]={count:(old.count||0)+1, streak:0, at:Date.now(), type:item.type, lesson:item.lesson};
+      }
+    });
+    saveWrong(wrong); saveMastered(mastered);
+    const score=Math.round(correct/state.quiz.length*100), weak=Object.keys(wrong).length, familiar=Object.keys(mastered).length;
+    document.getElementById('ps-app').innerHTML=`<section class="ps-card ps-result"><div class="ps-medal">${score>=90?'🏆':score>=70?'💪':'📚'}</div><h1>${score} 分</h1><p>答對 ${correct} / ${state.quiz.length} 題</p><h2>${score>=90?'達標！維持節奏，開始錯題複習。':score>=70?'快接近 90 分了，先把錯題練熟。':'先從常犯錯題庫開始，反覆練習最有效。'}</h2><div class="ps-summary">目前有 <b>${weak}</b> 題常錯題、<b>${familiar}</b> 題已練熟題。常錯題要連續答對 5 次才會畢業。</div><button class="ps-primary" onclick="PrivateSchool.review()">常犯錯題庫</button><button class="ps-secondary" onclick="PrivateSchool.home()">回私中專區</button></section>`;
+  }
   function review(){ const wrong=getWrong(), ids=Object.keys(wrong); if(!ids.length){alert('太棒了，目前沒有常犯錯題！');return;} state.quiz=shuffle(ids.map(id=>BANK.find(x=>x.id===id)).filter(Boolean)).slice(0,20);state.index=0;state.answers=[];renderQuestion(); }
+  function reviewMastered(){
+    const mastered=getMastered(), ids=Object.keys(mastered);
+    if(!ids.length){alert('目前還沒有完成連續答對 5 次的題目。');return;}
+    state.quiz=shuffle(ids.map(id=>BANK.find(x=>x.id===id)).filter(Boolean)).slice(0,20);
+    state.index=0; state.answers=[]; renderQuestion();
+  }
   function speakItem(id){
     const item=BANK.find(x=>x.id===id);
     if(!item||!('speechSynthesis' in window)) return;
@@ -244,9 +304,26 @@
     const wrong=getWrong(), weak=Object.keys(wrong).length;
     document.getElementById('ps-app').innerHTML=`<section class="ps-card"><header><button class="ps-back" onclick="PrivateSchool.close()">← 回首頁</button><span>嘉駿的私中專區</span><b>目標 90+</b></header><div class="ps-hero"><div>🎯</div><h1>私中入學英語衝刺</h1><p>六課題庫 · 不重複出題 · 針對錯題反覆加強</p></div><div class="ps-mode"><button class="${state.mode==='test'?'active':''}" onclick="PrivateSchool.setMode('test')">📝 直接考試</button><button class="${state.mode==='practice'?'active':''}" onclick="PrivateSchool.setMode('practice')">📖 範圍練習</button></div><h3>選擇測驗類型（可複選）</h3><div class="ps-types">${Object.entries(TYPES).map(([id,label])=>`<label class="${state.selected.has(id)?'chosen':''}"><input type="checkbox" ${state.selected.has(id)?'checked':''} onchange="PrivateSchool.type('${id}',this.checked)"><span>${({vocab:'🗂️',grammar:'🧩',cloze:'✍️',reading:'📖'})[id]}</span>${label}</label>`).join('')}</div><h3>選擇範圍</h3><div class="ps-lessons"><button class="${state.lessons.size===6?'active':''}" onclick="PrivateSchool.allLessons()">全部 Unit 1–6</button>${LESSONS.map((x,i)=>`<label class="${state.lessons.has(i)?'chosen':''}"><input type="checkbox" ${state.lessons.has(i)?'checked':''} onchange="PrivateSchool.lesson(${i},this.checked)">${x}</label>`).join('')}</div><div class="ps-ready"><span>${state.mode==='test'?'最多 ':'查看 '}<b>${state.mode==='test'?'20 題':'所選題目'}</b><small>${state.mode==='test'?'題庫不足 20 題時，會減少題數，絕不重複。':'可顯示答案、解析與英文朗讀。'}</small></span><button class="ps-primary" onclick="PrivateSchool.${state.mode==='test'?'start()':'practice()'}">${state.mode==='test'?'開始測驗':'開始練習'}</button></div><button class="ps-weak" onclick="PrivateSchool.review()">🔥 常犯錯題庫 <b>${weak}</b> 題</button><p class="ps-note">題庫依 Unit 1–6 的家庭、飲食、校園、日常、休閒、交通內容整理；Unit 7–12 加入後可直接擴充。</p></section>`;
   }
+  const renderHome=home;
+  home=function(){ renderHome(); renderLeaderboard(); };
+  function renderLeaderboard(){
+    const anchor=document.querySelector('#ps-app .ps-note');
+    if(!anchor) return;
+    const wrong=getWrong();
+    const rows=Object.entries(wrong)
+      .map(([id,record])=>({id,record,item:BANK.find(x=>x.id===id)}))
+      .filter(x=>x.item&&state.selected.has(x.item.type)&&state.lessons.has(x.item.lesson))
+      .sort((a,b)=>(b.record.count||0)-(a.record.count||0)||(b.record.at||0)-(a.record.at||0))
+      .slice(0,10);
+    const masteredCount=Object.values(getMastered()).filter(record=>state.selected.has(record.type)&&state.lessons.has(record.lesson)).length;
+    const list=rows.length
+      ? `<ol style="margin:8px 0 0;padding-left:22px;line-height:1.7">${rows.map(x=>`<li><b>${x.record.count||1} 次</b> · ${esc(x.item.stem)} <small>連對 ${x.record.streak||0}/5</small></li>`).join('')}</ol>`
+      : '<p style="margin:8px 0 0">目前這個範圍尚無錯題紀錄。</p>';
+    anchor.insertAdjacentHTML('afterend',`<section style="margin-top:14px;padding:14px;border:1px solid #fed7aa;border-radius:14px;background:#fffaf5;color:#7c2d12"><b>🔥 本範圍最常犯錯題庫 TOP 10</b>${list}<p style="margin:12px 0 8px;font-size:.82rem">連續答對同一題 5 次，才會移到「已練習熟悉」題庫。</p><button class="ps-answer" onclick="PrivateSchool.reviewMastered()">✅ 已練習熟悉（曾經常錯） ${masteredCount} 題</button></section>`);
+  }
   function open(){document.getElementById('ps-overlay').classList.add('open');home();}
   function close(){document.getElementById('ps-overlay').classList.remove('open');}
-  window.PrivateSchool={open,close,home,start,answer,next,review,practice,speakItem,toggleAnswer,setMode:m=>{state.mode=m;home();},type:(x,on)=>{on?state.selected.add(x):state.selected.delete(x);home();},lesson:(x,on)=>{on?state.lessons.add(x):state.lessons.delete(x);home();},allLessons:()=>{state.lessons=new Set([0,1,2,3,4,5]);home();}};
+  window.PrivateSchool={open,close,home,start,answer,next,review,reviewMastered,practice,speakItem,toggleAnswer,setMode:m=>{state.mode=m;home();},type:(x,on)=>{on?state.selected.add(x):state.selected.delete(x);home();},lesson:(x,on)=>{on?state.lessons.add(x):state.lessons.delete(x);home();},allLessons:()=>{state.lessons=new Set([0,1,2,3,4,5]);home();}};
   const style=`<style>
   #ps-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#172554,#4f46e5);padding:18px;overflow:auto;display:none;font-family:Segoe UI,'Microsoft JhengHei',sans-serif}#ps-overlay.open{display:block}.ps-card{max-width:720px;margin:0 auto 20px;background:#fff;border-radius:24px;padding:22px;box-shadow:0 20px 70px #0006}.ps-card header{display:flex;justify-content:space-between;align-items:center;color:#4338ca;font-weight:800;gap:8px}.ps-back{border:0;background:#eef2ff;color:#4338ca;border-radius:10px;padding:8px 10px;font-weight:700;cursor:pointer}.ps-hero{text-align:center;padding:18px 4px}.ps-hero div{font-size:3rem}.ps-hero h1{margin:6px 0;color:#1e1b4b}.ps-hero p,.ps-note,.ps-tip{color:#64748b;font-size:.85rem;line-height:1.5}.ps-card h3{font-size:.9rem;color:#475569;margin:18px 0 8px}.ps-types{display:grid;grid-template-columns:1fr 1fr;gap:9px}.ps-types label,.ps-lessons label{border:2px solid #e2e8f0;border-radius:12px;padding:11px;cursor:pointer;font-weight:700;color:#334155}.ps-types label.chosen,.ps-lessons label.chosen{border-color:#6366f1;background:#eef2ff;color:#3730a3}.ps-types input,.ps-lessons input{display:none}.ps-types span{margin-right:6px}.ps-lessons{display:flex;flex-wrap:wrap;gap:7px}.ps-lessons button{width:100%;border:0;border-radius:10px;padding:9px;background:#f1f5f9;color:#475569;font-weight:700;cursor:pointer}.ps-lessons button.active{background:#312e81;color:#fff}.ps-lessons label{font-size:.8rem;padding:8px}.ps-ready{display:flex;justify-content:space-between;align-items:center;margin-top:20px;background:#f8fafc;padding:13px;border-radius:14px;color:#334155}.ps-ready small{display:block;color:#64748b;font-size:.72rem;margin-top:3px}.ps-primary,.ps-secondary,.ps-weak{border:0;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer}.ps-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff}.ps-secondary{background:#e2e8f0;color:#334155;margin-left:8px}.ps-weak{width:100%;margin-top:10px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}.ps-mode{display:flex;gap:8px;margin:8px 0 18px}.ps-mode button{flex:1;border:2px solid #e2e8f0;border-radius:11px;padding:10px;background:#fff;color:#475569;font-weight:800;cursor:pointer}.ps-mode button.active{background:#4338ca;color:#fff;border-color:#4338ca}.ps-qtype{font-size:.76rem;color:#6366f1;font-weight:800;margin-top:18px}.ps-test h2,.ps-practice h2{font-size:1.2rem;line-height:1.5;color:#1e293b;margin:8px 0}.ps-question-row{display:flex;align-items:flex-start;gap:10px}.ps-question-row h2{flex:1}.ps-speak{flex:0 0 auto;border:0;background:#eef2ff;color:#4338ca;border-radius:10px;padding:8px;cursor:pointer;font-size:1.1rem}.ps-progress{height:7px;background:#e2e8f0;border-radius:8px;margin:14px 0}.ps-progress i{display:block;height:100%;background:#6366f1;border-radius:8px}.ps-passage{background:#f8fafc;border-left:4px solid #818cf8;padding:13px;line-height:1.7;color:#334155;font-size:.93rem}.ps-options{display:grid;gap:9px}.ps-options button{display:flex;text-align:left;align-items:center;gap:9px;border:2px solid #e2e8f0;background:#fff;border-radius:12px;padding:12px;cursor:pointer;font-size:.95rem}.ps-options button:hover{border-color:#818cf8}.ps-options b{background:#eef2ff;color:#4338ca;border-radius:7px;padding:3px 7px}.ps-options .ok{border-color:#22c55e;background:#f0fdf4}.ps-options .bad{border-color:#ef4444;background:#fef2f2}.ps-explain{margin-top:14px;padding:13px;border-radius:12px;line-height:1.55}.ps-explain.good{background:#f0fdf4;color:#166534}.ps-explain.wrong{background:#fff7ed;color:#9a3412}.ps-explain button{display:block;margin-top:9px;margin-left:auto;border:0;border-radius:9px;padding:8px 12px;background:#4338ca;color:#fff;font-weight:700;cursor:pointer}.ps-practice{border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin:12px 0}.ps-practice ol{padding-left:24px;color:#475569;line-height:1.65}.ps-answer{border:0;border-radius:9px;padding:8px 11px;background:#eef2ff;color:#4338ca;font-weight:700;cursor:pointer}.ps-answer-box{margin-top:9px;padding:10px;border-radius:9px;background:#f0fdf4;color:#166534;line-height:1.55}.ps-result{text-align:center;padding:40px 24px}.ps-result h1{font-size:3.2rem;color:#4f46e5;margin:4px}.ps-result h2{font-size:1.1rem;color:#334155}.ps-medal{font-size:4rem}.ps-summary{margin:18px 0;padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412}.private-zone{margin:14px 0;background:linear-gradient(135deg,#1e1b4b,#4f46e5);border-radius:16px;padding:14px;color:#fff;box-shadow:0 8px 20px #4338ca40}.private-zone div{font-weight:800;font-size:1rem}.private-zone p{font-size:.75rem;margin:4px 0 10px;color:#e0e7ff}.private-zone button{width:100%;border:0;border-radius:10px;padding:10px;background:#fff;color:#3730a3;font-weight:800;cursor:pointer}@media(max-width:480px){#ps-overlay{padding:9px}.ps-card{padding:16px;border-radius:18px}.ps-types{grid-template-columns:1fr}.ps-ready{align-items:flex-start;gap:12px}.ps-ready .ps-primary{white-space:nowrap}}
   </style>`;
