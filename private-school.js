@@ -18,6 +18,15 @@
     ['guitar','吉他',4],['piano','鋼琴',4],['draw pictures','畫畫',4],['relax','放鬆',4],['practice','練習',4],['leisure time','休閒時間',4],
     ['taxi','計程車',5],['traffic light','紅綠燈',5],['corner','轉角',5],['platform','月台',5],['ticket','車票',5],['map','地圖',5]
   ];
+  // 依掃描題庫 Unit 2–6 的核心字彙頁逐頁補齊（每單元 20 個）。
+  vocabWords.splice(20, vocabWords.length-20,
+    ['art','美術',1],['break','休息時間',1],['classmate','同學',1],['classroom','教室',1],['desk','書桌',1],['history','歷史',1],['homework','作業',1],['librarian','圖書館管理員',1],['library','圖書館',1],['lunch','午餐',1],['math','數學',1],['PE (Physical Education)','體育課',1],['playground','操場',1],['principal','校長',1],['school','學校',1],['science','科學',1],['subject','科目',1],['teacher','老師',1],['test','考試',1],['uniform','校服',1],
+    ['alarm clock','鬧鐘',2],['breakfast','早餐',2],['brush','刷（牙／頭髮）',2],['dinner','晚餐',2],['early','早地',2],['exercise','運動；鍛鍊',2],['habit','習慣',2],['healthy','健康的',2],['late','晚地',2],['morning','早晨',2],['plan','計畫；規劃',2],['read','閱讀',2],['rest','休息',2],['routine','日常作息',2],['sleep','睡覺',2],['snack','點心',2],['study','讀書；學習',2],['wash','洗',2],['watch','觀看',2],['weekend','週末',2],
+    ['bill','帳單',3],['cook','煮飯',3],['delicious','美味的',3],['dessert','甜點',3],['dish','菜餚；盤子',3],['full','飽的',3],['hungry','餓的',3],['juice','果汁',3],['menu','菜單',3],['milk','牛奶',3],['noodles','麵條',3],['order','點餐',3],['restaurant','餐廳',3],['rice','米飯',3],['salad','沙拉',3],['serve','端上（食物）；服務',3],['taste','品嘗；味道',3],['tasty','好吃的',3],['thirsty','口渴的',3],['waiter','男服務生',3],
+    ['activity','活動',4],['boring','無聊的',4],['collect','收集',4],['concert','音樂會',4],['dance','跳舞',4],['draw','畫畫',4],['enjoy','喜愛；享受',4],['exciting','令人興奮的',4],['fun','樂趣；有趣的',4],['listen','聆聽',4],['movie','電影',4],['music','音樂',4],['paint','繪畫；塗色',4],['play','玩；演奏',4],['practice','練習',4],['relax','放鬆',4],['ride','騎（腳踏車、馬等）',4],['shop','購物',4],['sing','唱歌',4],['swim','游泳',4],
+    ['across','穿越；橫越',5],['between','在…之間',5],['bus','公車',5],['car','汽車',5],['corner','轉角',5],['driver','司機',5],['far','遙遠的',5],['left','左邊的',5],['map','地圖',5],['minute','分鐘',5],['MRT','捷運',5],['near','在…附近',5],['next','下一個的；旁邊的',5],['right','右邊的',5],['road','道路',5],['station','車站',5],['street','街道',5],['taxi','計程車',5],['traffic light','紅綠燈',5],['train','火車',5]
+  );
+
   const distractors = vocabWords.map(x=>x[1]);
   const vocab = vocabWords.map((w,i) => {
     const other = distractors.filter(x=>x!==w[1]);
