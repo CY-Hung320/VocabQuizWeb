@@ -575,9 +575,11 @@
     speechSynthesis.cancel();
     // 題幹中任何常見括號內的英文（如 [aunt]、(aunt)、（aunt））都只念該英文；答案解析則一定完整朗讀。
     const bracketedEnglish=mode==='question'&&Array.from(item.stem.matchAll(/[\[［(（{｛<＜〈《「『]\s*([A-Za-z][A-Za-z' -]*)\s*[\]］)）}｝>＞〉》」』]/g)).map(match=>match[1]).find(Boolean);
-    const text=mode==='explanation'
+    const rawText=mode==='explanation'
       ? `正確答案：${item.opts[item.answer]}。解析：${item.explain}`
       : bracketedEnglish || (item.passage?item.passage+' ':'')+item.stem;
+    // 部分語音會把標點讀成名稱；朗讀時略過問號與句號。
+    const text=rawText.replace(/[?？.。]/g,'');
     const voices=speechSynthesis.getVoices();
     // 優先年輕、有活力的美式女聲；Windows 的 Natural／Online 聲音通常最清楚。
     const englishVoice = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria)/i.test(v.name))
