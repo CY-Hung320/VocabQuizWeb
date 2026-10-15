@@ -573,9 +573,9 @@
     const item=BANK.find(x=>x.id===id);
     if(!item||!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
-    // 題幹若有中括號英文（如 [aunt]），只念該英文單字；否則念文章與完整題幹，不念選項。
-    const bracketedEnglish=item.stem.match(/[\[［]\s*([A-Za-z][A-Za-z' -]*)\s*[\]］]/);
-    const text=bracketedEnglish ? bracketedEnglish[1] : (item.passage?item.passage+' ':'')+item.stem;
+    // 題幹中任何常見括號內的英文（如 [aunt]、(aunt)、（aunt））都只念該英文；否則念文章與完整題幹，不念選項。
+    const bracketedEnglish=Array.from(item.stem.matchAll(/[\[［(（{｛<＜〈《「『]\s*([A-Za-z][A-Za-z' -]*)\s*[\]］)）}｝>＞〉》」』]/g)).map(match=>match[1]).find(Boolean);
+    const text=bracketedEnglish || (item.passage?item.passage+' ':'')+item.stem;
     const voices=speechSynthesis.getVoices();
     // 優先年輕、有活力的美式女聲；Windows 的 Natural／Online 聲音通常最清楚。
     const englishVoice = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria)/i.test(v.name))
