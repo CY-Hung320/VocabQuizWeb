@@ -133,7 +133,8 @@
   const reading = passages.flatMap((p,pi) => p[2].map((r,ri) => q(`r${pi}-${ri}`,'reading',p[0],r[0],r[1],r[2],r[3],p[1])));
   const BANK = [...vocab,...grammar,...cloze,...reading];
 
-  let state = { selected:new Set(['vocab']), lessons:new Set([0,1,2,3,4,5]), quiz:[], index:0, answers:[], mode:'test' };
+  // 首次開啟預設從 Unit 1 開始，避免一次載入所有範圍。
+  let state = { selected:new Set(['vocab']), lessons:new Set([0]), quiz:[], index:0, answers:[], mode:'test' };
   const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const getWrong = () => { try { return JSON.parse(localStorage.getItem(KEY)||'{}'); } catch { return {}; } };
   const saveWrong = x => localStorage.setItem(KEY,JSON.stringify(x));
