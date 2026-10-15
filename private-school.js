@@ -616,8 +616,8 @@
     const optionBreak='§§§', optionLabelBreak='¤¤¤';
     const rawText=mode==='explanation'
       ? `正確答案：${item.opts[item.answer]}。解析：${item.explain}`
-      // 小寫選項代號可避免部分語音把 A 念成「capital A」，畫面上的選項仍維持大寫 A～D。
-      : bracketedEnglish || `${item.passage?item.passage+' ':''}${item.stem}${optionBreak}${item.opts.map((option,index)=>`${'abcd'[index]}${optionLabelBreak}${option}`).join(optionBreak)}`;
+      // 以發音拼寫送進語音引擎，避免某些瀏覽器把單獨字母念成「capital A」；畫面仍維持大寫 A～D。
+      : bracketedEnglish || `${item.passage?item.passage+' ':''}${item.stem}${optionBreak}${item.opts.map((option,index)=>`${['ay','bee','see','dee'][index]}${optionLabelBreak}${option}`).join(optionBreak)}`;
     // 部分語音會把標點讀成名稱；朗讀時略過問號與句號。
     const text=rawText.replace(/[?？.。]/g,'');
     const voices=speechSynthesis.getVoices();
