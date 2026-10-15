@@ -573,24 +573,35 @@
     const item=BANK.find(x=>x.id===id);
     if(!item||!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
-    // 字彙題只念英文單字本身；其他類型保留朗讀文章、題幹與選項。
-    const wordIndex=item.type==='vocab' ? Number(id.slice(1)) : -1;
-    const text=item.type==='vocab' && vocabWords[wordIndex]
-      ? vocabWords[wordIndex][0]
-      : (item.passage?item.passage+' ': '')+item.stem+'. '+item.opts.join(', ');
-    const voice=new SpeechSynthesisUtterance(text);
+    // 只念文章（若有）與題幹，絕不念 A/B/C/D 選項；中英文使用各自語音，避免中文被跳過。
+    const text=(item.passage?item.passage+' ':'')+item.stem;
     const voices=speechSynthesis.getVoices();
     // 優先年輕、有活力的美式女聲；Windows 的 Natural／Online 聲音通常最清楚。
-    const preferred = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria)/i.test(v.name))
+    const englishVoice = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria)/i.test(v.name))
       || voices.find(v => /en[-_]US/i.test(v.lang) && /(Jenny|Ava|Aria|Zira|Samantha|Google US English)/i.test(v.name))
       || voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft/i.test(v.name))
       || voices.find(v => /en[-_]US/i.test(v.lang));
-    if(preferred) voice.voice=preferred;
-    voice.lang='en-US';
-    voice.rate=item.type==='vocab' ? .76 : .84;
-    voice.pitch=1.12;
-    voice.volume=1;
-    speechSynthesis.speak(voice);
+    const chineseVoice = voices.find(v => /zh[-_]TW/i.test(v.lang) && /Microsoft.*(HsiaoYu|HanHan|YunJhe).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(HsiaoYu|HanHan|YunJhe)/i.test(v.name))
+      || voices.find(v => /zh[-_]TW/i.test(v.lang) && /Microsoft|Google/i.test(v.name))
+      || voices.find(v => /zh[-_]TW/i.test(v.lang));
+    const parts=(text.match(/[\u3400-\u9fff，。！？、；：「」『』（）]+|[^\u3400-\u9fff，。！？、；：「」『』（）]+/g)||[]).filter(part=>part.trim());
+    let index=0;
+    const speakNext=()=>{
+      if(index>=parts.length) return;
+      const part=parts[index++];
+      const isChinese=/[\u3400-\u9fff]/.test(part);
+      const voice=new SpeechSynthesisUtterance(part);
+      voice.lang=isChinese?'zh-TW':'en-US';
+      if(isChinese && chineseVoice) voice.voice=chineseVoice;
+      if(!isChinese && englishVoice) voice.voice=englishVoice;
+      voice.rate=isChinese?.92:.84;
+      voice.pitch=isChinese?1.04:1.12;
+      voice.volume=1;
+      voice.onend=speakNext;
+      voice.onerror=speakNext;
+      speechSynthesis.speak(voice);
+    };
+    speakNext();
   }
   function practice(){
     const items=BANK.filter(x=>state.selected.has(x.type)&&state.lessons.has(x.lesson));
