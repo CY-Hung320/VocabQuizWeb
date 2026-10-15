@@ -89,6 +89,42 @@
     q('c24','cloze',5,'Amy looks at the ___ to find the right platform.',['menu','map','dessert','library'],1,'找月台要看地圖 map。')
   ];
 
+  // Unit 1 原題庫（My Family、A Letter to My Cousin、Introducing Myself）第 5–10 題。
+  cloze.push(
+    q('c25','cloze',0,'How ___ you?',['am','is','are','be'],2,'主詞 you 要搭配 are。'),
+    q('c26','cloze',0,'He ___ from Tainan.',['am','is','are','be'],1,'單數主詞 He 要搭配 is。'),
+    q('c27','cloze',0,'Kevin is very kind and ___.',['friend','twelve','family','friendly'],3,'kind and friendly 表示「和善且友善」。'),
+    q('c28','cloze',0,'Hello! ___ name is Kelly.',['I','Mine','Me','My'],3,'name 前需用所有格 My。'),
+    q('c29','cloze',0,'___ hobby is drawing pictures.',['She','Her','Hers','She’s'],1,'hobby 前需用所有格 Her。'),
+    q('c30','cloze',0,'Where ___ you from?',['am','is','are','be'],2,'主詞 you 要搭配 are。')
+  );
+
+  // 每個 Unit 至少 20 題：原題不足的部分，以該單元字彙設計不同的補充克漏字題。
+  for(let lesson=0;lesson<LESSONS.length;lesson++){
+    const words=vocabWords.filter(w=>w[2]===lesson);
+    const existing=cloze.filter(item=>item.lesson===lesson).length;
+    const patterns=[
+      w=>`The English word for “${w[1]}” is ___.`,
+      w=>`Choose the word that means “${w[1]}”: ___.`,
+      w=>`In Unit ${lesson+1}, ___ means “${w[1]}”.`,
+      w=>`Please fill in the blank: ___ = “${w[1]}”.`,
+      w=>`The correct vocabulary word is ___ (${w[1]}).`
+    ];
+    for(let i=existing;i<20;i++){
+      const word=words[(i-existing)%words.length];
+      const other=words.filter(w=>w[0]!==word[0]).map(w=>w[0]);
+      const options=[word[0],...Array.from({length:3},(_,j)=>other[(i+j)%other.length])];
+      cloze.push(q(`cx-${lesson}-${i}`,'cloze',lesson,patterns[(i-existing)%patterns.length](word),options,0,`${word[0]} = ${word[1]}。`));
+    }
+  }
+
+  // 每次重新整理時，克漏字四個選項皆重新排列；答案索引也同步更新。
+  cloze.forEach(item=>{
+    const correct=item.opts[item.answer];
+    item.opts.sort(()=>Math.random()-.5);
+    item.answer=item.opts.indexOf(correct);
+  });
+
   // 同步調整克漏字的 Unit 標記，讓篩選單位與題庫目錄一致。
   cloze.slice(4,8).forEach(x => x.lesson = 3);   // 食物與餐廳
   cloze.slice(8,12).forEach(x => x.lesson = 1);  // 學校生活與科目
