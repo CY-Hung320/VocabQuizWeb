@@ -621,7 +621,7 @@
     const text=rawText.replace(/[?？.。]/g,'');
     const voices=speechSynthesis.getVoices();
     // 優先年輕、有活力的美式女聲；Windows 的 Natural／Online 聲音通常最清楚。
-    const englishVoice = voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria)/i.test(v.name))
+    const englishVoice = voices.find(v => /en[-_]US/i.test(v.lang) && /(Microsoft.*(Jenny|Ava|Aria).*?(Natural|Online)|Microsoft.*(Natural|Online).*?(Jenny|Ava|Aria))/i.test(v.name))
       || voices.find(v => /en[-_]US/i.test(v.lang) && /(Jenny|Ava|Aria|Zira|Samantha|Google US English)/i.test(v.name))
       || voices.find(v => /en[-_]US/i.test(v.lang) && /Microsoft/i.test(v.name))
       || voices.find(v => /en[-_]US/i.test(v.lang));
@@ -634,22 +634,25 @@
       if(mode!=='question'||index===0) return splitLanguages(section);
       const [label,...contentParts]=section.split(optionLabelBreak);
       const content=contentParts.join(optionLabelBreak);
-      return [label,'__choice_label_pause__',...splitLanguages(content),...(index<sections.length-1?['__option_pause__']:[])];
+      return [`__choice__${label}`,'__choice_label_pause__',...splitLanguages(content).map(part=>`__choice__${part}`),...(index<sections.length-1?['__option_pause__']:[])];
     });
     let index=0;
     const speakNext=()=>{
       if(run!==speechRun) return;
       if(index>=parts.length){setStopVisible(false);return;}
-      const part=parts[index++];
+      let part=parts[index++];
       if(part==='__choice_label_pause__'){setTimeout(speakNext,300);return;}
       if(part==='__option_pause__'){setTimeout(speakNext,650);return;}
+      const isChoice=part.startsWith('__choice__');
+      if(isChoice) part=part.slice('__choice__'.length);
       const isChinese=/[\u3400-\u9fff]/.test(part);
       const voice=new SpeechSynthesisUtterance(part);
       voice.lang=isChinese?'zh-TW':'en-US';
       if(isChinese && chineseVoice) voice.voice=chineseVoice;
       if(!isChinese && englishVoice) voice.voice=englishVoice;
-      voice.rate=isChinese?.92:.84;
-      voice.pitch=isChinese?1.04:1.12;
+      // 選項以較慢、清楚的英聽節奏朗讀；volume=1 是 Web Speech 可設定的最大音量。
+      voice.rate=isChoice?(isChinese?.86:.72):(isChinese?.92:.84);
+      voice.pitch=isChoice?(isChinese?1.02:1.06):(isChinese?1.04:1.12);
       voice.volume=1;
       voice.onend=()=>{if(run===speechRun)speakNext();};
       voice.onerror=()=>{if(run===speechRun)speakNext();};
