@@ -438,6 +438,20 @@
       return Math.random()-.5;
     }).slice(0,n);
   }
+  // 同一個單字有多種題型變化（v0、vx1-0…），但一場測驗只能取其中一題。
+  const vocabWordId = item => {
+    const match=String(item.id).match(/^v(?:x[123]-)?(\d+)$/);
+    return match ? Number(match[1]) : null;
+  };
+  function chooseVocab(pool,n){
+    const wrong=getWrong(), history=getHistory(), groups=new Map();
+    pool.forEach(item=>{const id=vocabWordId(item); if(id!==null){if(!groups.has(id))groups.set(id,[]);groups.get(id).push(item);}});
+    return [...groups.values()].map(items=>{
+      const unseen=items.filter(item=>!history.includes(item.id));
+      const candidates=unseen.length?unseen:items;
+      return [...candidates].sort((a,b)=>(wrong[b.id]?.count||0)-(wrong[a.id]?.count||0)||Math.random()-.5)[0];
+    }).sort((a,b)=>(wrong[b.id]?.count||0)-(wrong[a.id]?.count||0)||Math.random()-.5).slice(0,n);
+  }
   function start() {
     const types=[...state.selected];
     if(!types.length) return alert('請至少選一種測驗。');
@@ -451,8 +465,20 @@
     const target=Math.min(20,pool.length);
     const per=Math.floor(target/types.length), remainder=target%types.length;
     let qs=[];
-    types.forEach((t,i)=>qs.push(...choose(pool.filter(x=>x.type===t),per+(i<remainder?1:0))));
-    if(qs.length<target) qs.push(...choose(pool.filter(x=>!qs.some(y=>y.id===x.id)),target-qs.length));
+    types.forEach((t,i)=>{
+      const count=per+(i<remainder?1:0), typePool=pool.filter(x=>x.type===t);
+      qs.push(...(t==='vocab'?chooseVocab(typePool,count):choose(typePool,count)));
+    });
+    if(qs.length<target){
+      const usedWords=new Set(qs.filter(x=>x.type==='vocab').map(vocabWordId));
+      const extras=choose(pool.filter(x=>!qs.some(y=>y.id===x.id)),pool.length);
+      for(const item of extras){
+        const word=vocabWordId(item);
+        if(item.type==='vocab'&&usedWords.has(word)) continue;
+        qs.push(item); if(item.type==='vocab')usedWords.add(word);
+        if(qs.length===target) break;
+      }
+    }
     state.quiz=shuffle(qs).slice(0,target);
     const ids=state.quiz.map(item=>item.id);
     const recent=getHistory().filter(id=>!ids.includes(id)).concat(ids).slice(-160);
