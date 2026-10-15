@@ -643,7 +643,7 @@
       if(index>=parts.length){setStopVisible(false);return;}
       let part=parts[index++];
       if(part==='__choice_label_pause__'){setTimeout(speakNext,300);return;}
-      if(part==='__option_pause__'){setTimeout(speakNext,650);return;}
+      if(part==='__option_pause__'){setTimeout(speakNext,220);return;}
       const isChoice=part.startsWith('__choice__');
       if(isChoice) part=part.slice('__choice__'.length);
       const isChinese=/[\u3400-\u9fff]/.test(part);
