@@ -553,6 +553,12 @@ body{
     <button class="pick-btn" id="eb-full" onclick="selectExam('full')" style="display:none;grid-column:1/-1">
       <span class="pi">📋</span><span class="pn">全範圍模擬考</span><div class="ps">聽力＋筆試・仿真考卷</div>
     </button>
+    <button class="pick-btn" id="eb-new-mid" onclick="selectExam('new_mid')" style="display:none">
+      <span class="pi">📘</span><span class="pn">新期中聽讀</span><div class="ps">新單字範圍</div>
+    </button>
+    <button class="pick-btn" id="eb-cloze-new-mid" onclick="selectExam('cloze_new_mid')" style="display:none">
+      <span class="pi">🆕</span><span class="pn">新期中克漏字</span><div class="ps">新單字・填入字母</div>
+    </button>
     <button class="pick-btn" id="eb-cloze-mid" onclick="selectExam('cloze_mid')">
       <span class="pi">🔤</span><span class="pn">上學期克漏字</span><div class="ps">填入遺漏字母・20題</div>
     </button>
@@ -846,6 +852,19 @@ WORDS[2].lesson = [
   ["play","玩"],["sing","唱歌"],["swim","游泳"],["jog","慢跑"],["run","跑"],
   ["kick","踢"],["open","打開"],["like","喜歡"],["come","來"],["go","去"],
   ["eat","吃"],["drink","喝"],["ant","蟞蟻"],["goat","山羊"],["elf","精靈"],
+];
+
+// Grade 2 新期中考 vocabulary
+WORDS[2].new_mid = [
+  ["angry","生氣的"],["apple","蘋果"],["ant","螞蟻"],["aunt","阿姨/姑姑"],
+  ["bored","無聊的"],["brother","兄弟"],["come inside","進來"],["excited","興奮的"],
+  ["egg","蛋"],["elephant","大象"],["father","父親"],["go outside","出去"],
+  ["grandmother","祖母/外婆"],["grandfather","祖父/外公"],["happy","快樂的"],["hungry","餓的"],
+  ["ice cream","冰淇淋"],["inside","在裡面"],["mother","母親"],["monkey","猴子"],
+  ["proud","驕傲的"],["pig","豬"],["park","公園"],["queen","皇后"],
+  ["quiet","安靜的"],["sad","悲傷的"],["sick","生病的"],["sleepy","想睡的"],
+  ["scared","害怕的"],["shy","害羞的"],["sister","姊妹"],["tired","累的"],
+  ["thirsty","渴的"],["up","向上"],["umbrella","雨傘"],["uncle","叔叔/舅舅"],
 ];
 
 // Grade 4 lesson vocabulary (from New_lesson.txt)
@@ -1169,7 +1188,7 @@ function initWeakDots() {
     const g = i+2;
     if (!selName) { btn.classList.remove('has-weak'); return; }
     btn.classList.toggle('has-weak',
-      ['midterm','final'].some(e => Object.keys(ls.get(weakKey(g,e))).length > 0));
+      ['midterm','final','new_mid'].some(e => Object.keys(ls.get(weakKey(g,e))).length > 0));
   });
 }
 function selectName(n) {
@@ -1194,10 +1213,17 @@ function selectName(n) {
 function selectGrade(g) {
   selGrade = g;
   document.querySelectorAll('#grade-grid .sel-btn').forEach((b,i)=>b.classList.toggle('selected',i+2===g));
-  const fb = document.getElementById('eb-full');
-  fb.style.display = g === 2 ? 'block' : 'none';
-  if (g !== 2 && selExam === 'full') {
-    selExam = null; fb.classList.remove('selected');
+  const fb  = document.getElementById('eb-full');
+  const nmb = document.getElementById('eb-new-mid');
+  const ncm = document.getElementById('eb-cloze-new-mid');
+  fb.style.display  = g === 2 ? 'block' : 'none';
+  nmb.style.display = g === 2 ? 'block' : 'none';
+  ncm.style.display = g === 2 ? 'block' : 'none';
+  if (g !== 2 && (selExam === 'full' || selExam === 'new_mid' || selExam === 'cloze_new_mid')) {
+    selExam = null;
+    fb.classList.remove('selected');
+    nmb.classList.remove('selected');
+    ncm.classList.remove('selected');
     document.getElementById('count-section').style.display = '';
   }
   refreshAlert(); checkReady();
@@ -1207,9 +1233,11 @@ function selectExam(e) {
   document.getElementById('eb-mid').classList.toggle('selected', e==='midterm');
   document.getElementById('eb-fin').classList.toggle('selected', e==='final');
   document.getElementById('eb-full').classList.toggle('selected', e==='full');
+  document.getElementById('eb-new-mid').classList.toggle('selected', e==='new_mid');
+  document.getElementById('eb-cloze-new-mid').classList.toggle('selected', e==='cloze_new_mid');
   document.getElementById('eb-cloze-mid').classList.toggle('selected', e==='cloze_mid');
   document.getElementById('eb-cloze-fin').classList.toggle('selected', e==='cloze_fin');
-  const hideCount = e === 'full' || e === 'cloze_mid' || e === 'cloze_fin';
+  const hideCount = e === 'full' || e === 'cloze_mid' || e === 'cloze_fin' || e === 'cloze_new_mid';
   document.getElementById('count-section').style.display = hideCount ? 'none' : '';
   if (hideCount) selCount = null;
   refreshAlert(); checkReady();
@@ -1246,8 +1274,8 @@ function selectMode(m) {
 }
 function checkReady() {
   const fullReady = selName!==null && selGrade===2 && selExam==='full';
-  const clozeReady = selName!==null && selGrade!==null && (selExam==='cloze_mid' || selExam==='cloze_fin');
-  const quizReady = selName!==null && selGrade!==null && selExam!==null && selExam!=='full' && selExam!=='cloze_mid' && selExam!=='cloze_fin' && selCount!==null;
+  const clozeReady = selName!==null && selGrade!==null && (selExam==='cloze_mid' || selExam==='cloze_fin' || selExam==='cloze_new_mid');
+  const quizReady = selName!==null && selGrade!==null && selExam!==null && selExam!=='full' && !['cloze_mid','cloze_fin','cloze_new_mid'].includes(selExam) && selCount!==null;
   const studyReady = selName!==null && selGrade!==null;
   document.getElementById('start-btn').classList.toggle('ready', quizReady || fullReady || clozeReady);
   const sb = document.getElementById('study-btn');
@@ -1266,7 +1294,13 @@ function startStudy() {
   if (!selGrade) return;
   const mid = WORDS[selGrade].midterm || [];
   const fin = WORDS[selGrade].final || [];
-  studyWords = shuffle([...mid, ...fin]);
+  const nmd = WORDS[selGrade].new_mid || [];
+  const merged = [...mid, ...fin, ...nmd];
+  const seen = new Set();
+  studyWords = shuffle(merged.filter(w => {
+    if (seen.has(w[0])) return false;
+    seen.add(w[0]); return true;
+  }));
   studyIdx = 0;
   studyFlipped = false;
   document.getElementById('study-title').textContent = '📖 ' + selGrade + '年級單字';
@@ -1388,7 +1422,7 @@ function handleTimeout() {
 
 function startQuiz() {
   if (selExam === 'full') { startPaperExam(); return; }
-  if (selExam === 'cloze_mid' || selExam === 'cloze_fin') { startClozeQuiz(); return; }
+  if (selExam === 'cloze_mid' || selExam === 'cloze_fin' || selExam === 'cloze_new_mid') { startClozeQuiz(); return; }
   questions = buildQuestions(selGrade, selExam, selCount);
   totalQ = questions.length;
   qIdx = 0; score = 0;
@@ -1451,7 +1485,9 @@ function renderQuestion() {
   const spkBtn = document.getElementById('speak-btn');
   spkBtn.style.display = 'none';
 
-  const allWords = [...WORDS[selGrade].midterm, ...WORDS[selGrade].final];
+  const allWords = selExam === 'new_mid'
+    ? [...(WORDS[selGrade].new_mid || [])]
+    : [...WORDS[selGrade].midterm, ...WORDS[selGrade].final];
   const wrong = shuffle(allWords.filter(w=>w[0]!==word[0])).slice(0,3);
   let opts, correctIdx, optDisplay;
 
@@ -1636,7 +1672,7 @@ function showResult() {
   else {
     wSec.style.display='';
     document.getElementById('r-wc').textContent = weakEntries.length;
-    const allW = [...WORDS[selGrade].midterm,...WORDS[selGrade].final];
+    const allW = [...WORDS[selGrade].midterm,...WORDS[selGrade].final,...(WORDS[selGrade].new_mid||[])];
     const enToZh = Object.fromEntries(allW.map(w=>[w[0],w[1]]));
     wTags.innerHTML = weakEntries.map(([en,cnt])=>`
       <div class="weak-tag">
@@ -1841,7 +1877,7 @@ function renderLeaderboard(targetId) {
 
   const top10 = sorted.slice(0, 10);
   const medals = ['🥇', '🥈', '🥉'];
-  const examNames = { midterm: '期中', final: '期末' };
+  const examNames = { midterm: '期中', final: '期末', new_mid: '新期中' };
 
   podium.innerHTML = top10.map((r, i) => {
     const avatar = avatarMap2[r.name] || '😊';
@@ -1899,7 +1935,7 @@ function renderHistory() {
   // List (newest first, max 100)
   const list = document.getElementById('hist-list');
   const show = [...filtered].reverse().slice(0, 100);
-  const examNames = { midterm: '期中', final: '期末' };
+  const examNames = { midterm: '期中', final: '期末', new_mid: '新期中' };
 
   if (show.length === 0) {
     list.innerHTML = '<div class="lb-empty">還沒有紀錄</div>';
@@ -1925,7 +1961,7 @@ function updateWeakBtn() {
   if (!selName) { btn.classList.remove('show'); return; }
   let totalWeak = 0;
   for (let g = 2; g <= 6; g++) {
-    ['midterm','final'].forEach(e => {
+    ['midterm','final','new_mid'].forEach(e => {
       totalWeak += Object.keys(ls.get(weakKey(g,e))).length;
     });
   }
@@ -1951,7 +1987,7 @@ function renderWeakPanel() {
   let totalWeak = 0;
   for (let g = 2; g <= 6; g++) {
     let gradeItems = [];
-    ['midterm','final'].forEach(e => {
+    ['midterm','final','new_mid'].forEach(e => {
       const weak = ls.get(weakKey(g,e));
       const allW = [...(WORDS[g]?.[e] || [])];
       const enToZh = Object.fromEntries(allW.map(w=>[w[0],w[1]]));
@@ -2149,7 +2185,7 @@ function renderLeaderboard(targetId) {
 
   const top10 = sorted.slice(0, 10);
   const medals = ['🥇', '🥈', '🥉'];
-  const examNames = { midterm: '期中', final: '期末' };
+  const examNames = { midterm: '期中', final: '期末', new_mid: '新期中' };
 
   podium.innerHTML = top10.map((r, i) => {
     const avatar = avatarMap2[r.name] || '😊';
@@ -2207,7 +2243,7 @@ function renderHistory() {
   // List (newest first, max 100)
   const list = document.getElementById('hist-list');
   const show = [...filtered].reverse().slice(0, 100);
-  const examNames = { midterm: '期中', final: '期末' };
+  const examNames = { midterm: '期中', final: '期末', new_mid: '新期中' };
 
   if (show.length === 0) {
     list.innerHTML = '<div class="lb-empty">還沒有紀錄</div>';
@@ -2234,7 +2270,7 @@ function updateWeakBtn() {
   if (!selName) { btn.classList.remove('show'); return; }
   let totalWeak = 0;
   for (let g = 2; g <= 6; g++) {
-    ['midterm','final'].forEach(e => {
+    ['midterm','final','new_mid'].forEach(e => {
       totalWeak += Object.keys(ls.get(weakKey(g,e))).length;
     });
   }
@@ -2260,7 +2296,7 @@ function renderWeakPanel() {
   let totalWeak = 0;
   for (let g = 2; g <= 6; g++) {
     let gradeItems = [];
-    ['midterm','final'].forEach(e => {
+    ['midterm','final','new_mid'].forEach(e => {
       const weak = ls.get(weakKey(g,e));
       const allW = [...(WORDS[g]?.[e] || [])];
       const enToZh = Object.fromEntries(allW.map(w=>[w[0],w[1]]));
@@ -2742,12 +2778,17 @@ function pePlayLC2() {
 let czState = null;
 
 function getClozePool(grade, examType) {
-  const base = examType === 'cloze_mid'
-    ? [...(WORDS[grade]?.midterm || [])]
-    : [...(WORDS[grade]?.final   || [])];
-  const lesson = WORDS[grade]?.lesson || [];
-  const half   = Math.ceil(lesson.length / 2);
-  const extra  = examType === 'cloze_mid' ? lesson.slice(0, half) : lesson.slice(half);
+  let base, extra = [];
+  if (examType === 'cloze_new_mid') {
+    base = [...(WORDS[grade]?.new_mid || [])];
+  } else {
+    base = examType === 'cloze_mid'
+      ? [...(WORDS[grade]?.midterm || [])]
+      : [...(WORDS[grade]?.final   || [])];
+    const lesson = WORDS[grade]?.lesson || [];
+    const half   = Math.ceil(lesson.length / 2);
+    extra = examType === 'cloze_mid' ? lesson.slice(0, half) : lesson.slice(half);
+  }
   const raw = [...base, ...extra];
   return [...new Map(raw.map(w => [w[0], w])).values()]
     .filter(w => /^[a-zA-Z]+$/.test(w[0]) && w[0].length >= 2);
@@ -2769,9 +2810,15 @@ function buildClozeQuiz() {
   };
 }
 
+function clozeSemLabel() {
+  if (selExam === 'cloze_mid') return '上學期';
+  if (selExam === 'cloze_new_mid') return '新期中';
+  return '下學期';
+}
+
 function startClozeQuiz() {
   czState = buildClozeQuiz();
-  const semLabel = selExam === 'cloze_mid' ? '上學期' : '下學期';
+  const semLabel = clozeSemLabel();
   document.getElementById('pe-title').textContent =
     `${selName} – ${selGrade}年級 ${semLabel} 克漏字`;
   showScreen('screen-paper');
@@ -2779,7 +2826,7 @@ function startClozeQuiz() {
 }
 
 function renderClozeIntro() {
-  const semLabel = selExam === 'cloze_mid' ? '上學期' : '下學期';
+  const semLabel = clozeSemLabel();
   const diff = peDiff();
   document.getElementById('pe-body').innerHTML = `
     <div style="text-align:center;padding:16px 8px">
@@ -2895,8 +2942,10 @@ function czFinish() {
   const pct         = Math.round(correct/total*100);
   const elapsedSecs = Math.round((Date.now() - czState.startTime) / 1000);
   const emoji       = pct>=90?'🎉':pct>=70?'😊':pct>=50?'🙂':'😅';
-  const semLabel    = selExam === 'cloze_mid' ? '上學期' : '下學期';
-  const examLabel   = `${selGrade}年${semLabel === '上學期' ? '上' : '下'}克漏字`;
+  const semLabel    = clozeSemLabel();
+  const examLabel   = selExam === 'cloze_new_mid'
+    ? `${selGrade}年新期中克漏字`
+    : `${selGrade}年${semLabel === '上學期' ? '上' : '下'}克漏字`;
 
   // Save to leaderboard
   const today     = new Date().toISOString().slice(0, 10);
@@ -3067,5 +3116,6 @@ function pePaperFinish() {
 }
 
 </script>
+<script src="private-school.js"></script>
 </body>
 </html>
