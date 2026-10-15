@@ -230,24 +230,115 @@
     q('c30','cloze',0,'Where ___ you from?',['am','is','are','be'],2,'主詞 you 要搭配 are。')
   );
 
-  // 每個 Unit 至少 20 題：原題不足的部分，以該單元字彙設計不同的補充克漏字題。
-  for(let lesson=0;lesson<LESSONS.length;lesson++){
-    const words=vocabWords.filter(w=>w[2]===lesson);
-    const existing=cloze.filter(item=>item.lesson===lesson).length;
-    const patterns=[
-      w=>`The English word for “${w[1]}” is ___.`,
-      w=>`Choose the word that means “${w[1]}”: ___.`,
-      w=>`In Unit ${lesson+1}, ___ means “${w[1]}”.`,
-      w=>`Please fill in the blank: ___ = “${w[1]}”.`,
-      w=>`The correct vocabulary word is ___ (${w[1]}).`
-    ];
-    for(let i=existing;i<20;i++){
-      const word=words[(i-existing)%words.length];
-      const other=words.filter(w=>w[0]!==word[0]).map(w=>w[0]);
-      const options=[word[0],...Array.from({length:3},(_,j)=>other[(i+j)%other.length])];
-      cloze.push(q(`cx-${lesson}-${i}`,'cloze',lesson,patterns[(i-existing)%patterns.length](word),options,0,`${word[0]} = ${word[1]}。`));
-    }
-  }
+  // 保留掃描題庫原題，再依相同 Unit 的單字、文法與私中常見四選一題型延伸。
+  // 不再用「中文意思填英文」湊題數，所有補充題皆為句意判斷的情境式克漏字。
+  const extraCloze = [
+    [ // Unit 1：原題有 10 題，補 10 題
+      ['My ___ is Linda. Nice to meet you!',['name','family','friend','hobby'],0,'介紹自己時說 My name is ...。'],
+      ['Kevin lives with his ___ in Taichung.',['family','classroom','restaurant','station'],0,'和家人一起住使用 family。'],
+      ['My father’s sister is my ___.',['aunt','uncle','cousin','sister'],0,'父親的姊妹是 aunt。'],
+      ['Amy and I are classmates. She is my good ___.',['friend','mother','teacher','father'],0,'同學且關係好是 friend。'],
+      ['Jack is kind and ___ to everyone in his class.',['friendly','hungry','late','full'],0,'對每個人友善使用 friendly。'],
+      ['My brother is very ___; he studies every night.',['hard-working','thirsty','boring','far'],0,'每天努力讀書表示 hard-working。'],
+      ['Lucy and her cousin play basketball ___.',['together','behind','early','never'],0,'一起玩使用 together。'],
+      ['My mother is very ___ and gives me a warm hug.',['loving','left','tasty','busy'],0,'慈愛的媽媽使用 loving。'],
+      ['I am ___ years old, and I am in sixth grade.',['twelve','twenty','second','twice'],0,'十二歲使用 twelve。'],
+      ['Ben has one brother and one ___.',['sister','aunt','teacher','waiter'],0,'one brother and one sister 是手足。']
+    ],
+    [ // Unit 2：原題有 4 題，補 16 題
+      ['We have art class on Monday. Art is my favorite ___.',['subject','uniform','desk','break'],0,'art 是一門科目，使用 subject。'],
+      ['Please put your books on your ___.',['desk','playground','lunch','library'],0,'書放在書桌上使用 desk。'],
+      ['Ms. Wang teaches math. She is our math ___.',['teacher','librarian','principal','classmate'],0,'教導學生的人是 teacher。'],
+      ['The ___ welcomes new students at the school gate.',['principal','waiter','driver','uncle'],0,'校長是 principal。'],
+      ['We borrow storybooks from the ___.',['library','classroom','restaurant','station'],0,'借書的地方是 library。'],
+      ['The ___ helps students find books in the library.',['librarian','classmate','teacher','driver'],0,'圖書館管理員是 librarian。'],
+      ['We run and play games on the ___.',['playground','desk','uniform','lunch'],0,'跑步玩遊戲的地方是 playground。'],
+      ['Students wear a school ___ on Monday.',['uniform','subject','test','break'],0,'校服是 uniform。'],
+      ['I study science, math, and history at ___.',['school','restaurant','station','corner'],0,'上學的地方是 school。'],
+      ['We eat ___ in the cafeteria at noon.',['lunch','homework','test','art'],0,'中午吃的是 lunch。'],
+      ['There is a math ___ tomorrow, so I study tonight.',['test','break','desk','library'],0,'明天要考試使用 test。'],
+      ['During the ___, students can rest for ten minutes.',['break','subject','uniform','classroom'],0,'休息時間是 break。'],
+      ['Tom is in my class. He is my ___.',['classmate','principal','librarian','waiter'],0,'同班同學是 classmate。'],
+      ['Our science ___ is bright and clean.',['classroom','playground','library','station'],0,'上科學課的教室是 classroom。'],
+      ['PE means Physical ___.',['Education','Exercise','English','Evening'],0,'PE 是 Physical Education。'],
+      ['History tells us about people and events from the ___.',['past','menu','future','corner'],0,'history 與過去發生的事有關。']
+    ],
+    [ // Unit 3：原題有 4 題，補 16 題
+      ['My ___ rings at six, so I get up early.',['alarm clock','traffic light','menu','map'],0,'早晨叫醒人的鬧鐘是 alarm clock。'],
+      ['I eat eggs and bread for ___.',['breakfast','dinner','snack','lunch'],0,'早上吃的是 breakfast。'],
+      ['Please ___ your teeth before you go to bed.',['brush','watch','serve','collect'],0,'睡前刷牙使用 brush。'],
+      ['My family eats ___ together at seven every night.',['dinner','breakfast','snack','lunch'],0,'晚上七點吃的是 dinner。'],
+      ['Mia gets up ___ because she takes the first bus.',['early','late','full','far'],0,'搭第一班車要早起，使用 early。'],
+      ['Running in the park is good ___.',['exercise','homework','dessert','traffic'],0,'跑步是一種 exercise。'],
+      ['Drinking water is a healthy ___.',['habit','corner','subject','bill'],0,'健康習慣是 healthy habit。'],
+      ['Don’t be ___ for school again.',['late','early','friendly','hungry'],0,'上學遲到使用 late。'],
+      ['I read a book every ___.',['morning','restaurant','station','uniform'],0,'每天早晨使用 every morning。'],
+      ['We make a study ___ before the test.',['plan','map','menu','bill'],0,'讀書計畫是 study plan。'],
+      ['You should ___ for the English test tonight.',['study','sleep','wash','ride'],0,'為考試讀書使用 study。'],
+      ['After two hours of homework, I need to ___.',['rest','order','serve','draw'],0,'做完很久功課需要休息，使用 rest。'],
+      ['My daily ___ starts with breakfast and exercise.',['routine','concert','family','road'],0,'日常作息是 routine。'],
+      ['Most children ___ for eight hours at night.',['sleep','swim','sing','shop'],0,'晚上睡覺使用 sleep。'],
+      ['An apple is a healthy ___.',['snack','subject','station','dessert'],0,'蘋果可當健康點心 snack。'],
+      ['I ___ my hands before dinner.',['wash','paint','listen','drive'],0,'晚餐前洗手使用 wash。']
+    ],
+    [ // Unit 4：原題有 4 題，補 16 題
+      ['After we eat, Dad asks for the ___.',['bill','menu','map','uniform'],0,'用餐後結帳要拿 bill。'],
+      ['My mother can ___ delicious soup.',['cook','ride','draw','drive'],0,'煮湯使用 cook。'],
+      ['This cake is sweet and ___.',['delicious','late','far','left'],0,'美味的蛋糕是 delicious。'],
+      ['Ice cream is my favorite ___.',['dessert','subject','break','station'],0,'冰淇淋是甜點 dessert。'],
+      ['The waiter brings a fish ___ to our table.',['dish','road','test','map'],0,'一道魚料理是 a fish dish。'],
+      ['I am very ___ because I did not eat lunch.',['hungry','full','friendly','early'],0,'沒吃午餐會餓，使用 hungry。'],
+      ['Would you like orange ___ with your breakfast?',['juice','rice','noodles','salad'],0,'柳橙汁是 orange juice。'],
+      ['Let’s read the ___ before we order food.',['menu','bill','map','uniform'],0,'點餐前讀菜單 menu。'],
+      ['A glass of ___ is good for children.',['milk','rice','salad','noodles'],0,'一杯牛奶是 a glass of milk。'],
+      ['I would like chicken ___ for lunch.',['noodles','juice','milk','dessert'],0,'雞肉麵是 chicken noodles。'],
+      ['May I ___ a salad, please?',['order','serve','taste','cook'],0,'在餐廳點餐使用 order。'],
+      ['We eat ___ with chopsticks.',['rice','juice','milk','soup'],0,'用筷子吃飯是 rice。'],
+      ['The waiter will ___ the food soon.',['serve','collect','watch','brush'],0,'服務生端上食物使用 serve。'],
+      ['Please ___ the soup before you add salt.',['taste','order','wash','study'],0,'品嘗湯使用 taste。'],
+      ['These noodles are really ___.',['tasty','thirsty','boring','near'],0,'好吃的麵是 tasty。'],
+      ['After running, I am very ___.',['thirsty','full','loving','early'],0,'跑步後口渴使用 thirsty。']
+    ],
+    [ // Unit 5：原題有 4 題，補 16 題
+      ['Swimming is a fun weekend ___.',['activity','subject','uniform','corner'],0,'週末活動是 activity。'],
+      ['The movie is too long and ___.',['boring','exciting','tasty','friendly'],0,'太長又無聊使用 boring。'],
+      ['I like to ___ stamps from different countries.',['collect','serve','cross','wash'],0,'收集郵票使用 collect。'],
+      ['We go to a music ___ on Saturday night.',['concert','restaurant','station','classroom'],0,'音樂會是 concert。'],
+      ['Amy loves to ___ to pop music.',['dance','drive','cook','study'],0,'隨音樂跳舞使用 dance。'],
+      ['Can you ___ a picture of your family?',['draw','ride','order','rest'],0,'畫圖使用 draw。'],
+      ['I ___ listening to music after school.',['enjoy','am','do','have'],0,'喜歡享受某活動使用 enjoy。'],
+      ['The soccer game is very ___.',['exciting','boring','thirsty','late'],0,'令人興奮的比賽是 exciting。'],
+      ['Playing games with friends is great ___.',['fun','traffic','history','homework'],0,'樂趣是 fun。'],
+      ['Please ___ carefully to the teacher.',['listen','paint','swim','shop'],0,'仔細聽老師說話使用 listen。'],
+      ['We watch a ___ at home on Friday night.',['movie','menu','map','uniform'],0,'在家看的電影是 movie。'],
+      ['My sister plays the piano because she loves ___.',['music','math','milk','traffic'],0,'鋼琴與 music 有關。'],
+      ['I use many colors to ___ a picture.',['paint','read','wash','order'],0,'上色繪畫使用 paint。'],
+      ['The children ___ in the park after school.',['play','plays','playing','to playing'],0,'children 是複數，使用原形 play。'],
+      ['Practice makes you better at the ___.',['piano','station','salad','road'],0,'練習鋼琴可進步，使用 piano。'],
+      ['After a busy week, I want to ___.',['relax','test','serve','greet'],0,'忙碌後想放鬆，使用 relax。']
+    ],
+    [ // Unit 6：原題有 4 題，補 16 題
+      ['Please walk ___ the street at the traffic light.',['across','between','under','behind'],0,'穿越街道使用 across。'],
+      ['The bookstore is ___ the bank and the park.',['between','across','under','near'],0,'兩者之間使用 between。'],
+      ['I take the ___ to school every morning.',['bus','map','corner','road'],0,'每天搭公車上學使用 bus。'],
+      ['My dad drives a ___ to work.',['car','station','street','train'],0,'開車上班使用 car。'],
+      ['Turn right at the next ___.',['corner','minute','ticket','driver'],0,'在下一個轉角右轉，使用 corner。'],
+      ['The bus ___ says, “Good morning!”',['driver','waiter','librarian','principal'],0,'公車司機是 driver。'],
+      ['The museum is too ___ to walk to.',['far','near','left','right'],0,'太遠不能走路，使用 far。'],
+      ['Turn ___ at the traffic light to get to the bank.',['left','far','near','across'],0,'左轉使用 turn left。'],
+      ['Look at the ___ before you visit a new city.',['map','menu','bill','test'],0,'到新城市前看地圖 map。'],
+      ['It takes ten ___ to get to school.',['minutes','roads','corners','trains'],0,'十分鐘是 ten minutes。'],
+      ['The ___ is faster than the bus in Taipei.',['MRT','taxi driver','traffic light','street'],0,'台北捷運是 MRT。'],
+      ['My home is ___ the train station, so I can walk there.',['near','far','between','across'],0,'可以走路表示很近，使用 near。'],
+      ['The bakery is ___ to the library.',['next','full','early','tasty'],0,'在圖書館旁邊使用 next to。'],
+      ['Please turn ___ at the second corner.',['right','late','behind','across'],0,'右轉使用 turn right。'],
+      ['This ___ leads to the train station.',['road','dessert','subject','routine'],0,'通往車站的道路是 road。'],
+      ['We wait for the train at the ___.',['station','restaurant','classroom','playground'],0,'等火車的地方是 station。']
+    ]
+  ];
+  extraCloze.forEach((rows,lesson)=>rows.forEach((row,index)=>
+    cloze.push(q(`cx-${lesson}-${index}`,'cloze',lesson,...row))
+  ));
 
   // 每次重新整理時，克漏字四個選項皆重新排列；答案索引也同步更新。
   cloze.forEach(item=>{
