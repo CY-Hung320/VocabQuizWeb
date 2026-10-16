@@ -5,7 +5,7 @@
   let session=null,timer=null;
   const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'{}')}catch(_){return {}}}, write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), nl=v=>esc(v).replace(/\n/g,'<br>');
-  const limit=n=>n<=30?30:60, clock=s=>`00:${String(Math.max(0,s)).padStart(2,'0')}`;
+  const limit=n=>n<=30?30:60, clock=s=>{const t=Math.max(0,s);return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
   const bank=()=>window.MockEnglishQuestionBank||[], questions=p=>bank().filter(q=>q.paper===p).sort((a,b)=>a.no-b.no), find=id=>bank().find(q=>q.id===id);
   function stop(){if(timer)clearInterval(timer);timer=null} function root(){let e=document.getElementById('mock-exam-overlay');if(!e){e=document.createElement('div');e.id='mock-exam-overlay';document.body.appendChild(e)}return e}
   function mount(html){root().innerHTML=`<style>
