@@ -8,6 +8,16 @@
   const limit=n=>n<=30?30:60, clock=s=>{const t=Math.max(0,s);return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
   const bank=()=>window.MockEnglishQuestionBank||[], questions=p=>bank().filter(q=>q.paper===p).sort((a,b)=>a.no-b.no), find=id=>bank().find(q=>q.id===id);
   const groupFor=no=>{
+    if(session?.paper===13){
+      if(no>=21&&no<=23)return [21,23];
+      if(no>=24&&no<=26)return [24,26];
+      if(no>=27&&no<=30)return [27,30];
+    }
+    if(session?.paper===6){
+      if(no>=21&&no<=24)return [21,24];
+      if(no>=25&&no<=28)return [25,28];
+      if(no>=29&&no<=30)return [29,30];
+    }
     if(no>=21&&no<=24)return [21,24];
     if(no>=25&&no<=27)return [25,27];
     if(no>=28&&no<=30)return [28,30];
