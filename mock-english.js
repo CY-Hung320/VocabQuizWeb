@@ -7,7 +7,7 @@
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), nl=v=>esc(v).replace(/\n/g,'<br>');
   const limit=n=>n<=30?30:60, clock=s=>{const t=Math.max(0,s);return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
   const bank=()=>window.MockEnglishQuestionBank||[], questions=p=>bank().filter(q=>q.paper===p).sort((a,b)=>a.no-b.no), find=id=>bank().find(q=>q.id===id);
-  function stop(){if(timer)clearInterval(timer);timer=null} function root(){let e=document.getElementById('mock-exam-overlay');if(!e){e=document.createElement('div');e.id='mock-exam-overlay';document.body.appendChild(e)}return e}
+  function stop(){if(timer)clearInterval(timer);timer=null;stopMockSpeech()} function root(){let e=document.getElementById('mock-exam-overlay');if(!e){e=document.createElement('div');e.id='mock-exam-overlay';document.body.appendChild(e)}return e}
   function mount(html){root().innerHTML=`<style>
     #mock-exam-overlay{position:fixed;inset:0;z-index:10001;overflow:auto;background:linear-gradient(135deg,#102a43,#243b53);padding:16px;font-family:Arial,'Microsoft JhengHei',sans-serif;color:#172b4d}#mock-exam-overlay *{box-sizing:border-box}.me-card{max-width:920px;margin:auto;background:#fff;border-radius:20px;padding:22px;box-shadow:0 18px 48px #0007}.me-card h1{margin:0 0 8px;font-size:1.55rem}.me-card p{line-height:1.65}.me-head{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;background:#fff;padding-bottom:12px;z-index:2}.me-btn,.me-back,.me-choice{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}.me-btn{background:#1261a0;color:#fff}.me-back{background:#e8eef6;color:#172b4d}.me-btn[disabled],.me-back[disabled]{background:#cbd5e1;color:#64748b;cursor:not-allowed}.me-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px;margin:18px 0}.me-paper{border:1px solid #cbd5e1;border-radius:14px;padding:15px;text-align:left;background:#fff}.me-paper h2{font-size:1rem;margin:0 0 7px}.me-paper small,.me-note{color:#52606d}.me-status{padding:12px;border-radius:12px;background:#eaf3fb;color:#12406d}.me-timer{font-variant-numeric:tabular-nums;font-size:1.18rem;color:#b42318}.me-progress{height:9px;background:#e5edf5;border-radius:99px;overflow:hidden;margin:10px 0 20px}.me-progress span{display:block;height:100%;background:#1d8f6e}.me-section{font-size:.9rem;color:#52606d;font-weight:700}.me-stem{font-size:1.16rem;line-height:1.75;margin:18px 0}.me-asset{max-width:100%;max-height:280px;object-fit:contain;margin:6px 0 16px}.me-table{width:100%;border-collapse:collapse;margin:12px 0}.me-table td,.me-table th{border:1px solid #94a3b8;padding:7px;text-align:left}.me-choices{display:grid;gap:10px}.me-choice{text-align:left;background:#fff;border:1.5px solid #cbd5e1;font-size:1rem}.me-choice:hover{border-color:#1261a0;background:#f4f9ff}.me-choice.selected{border-color:#1261a0;background:#dcedfb;color:#0c4a78}.me-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:20px}.me-review-list{display:grid;gap:10px;margin:18px 0}.me-answer{border-radius:12px;padding:14px;margin:14px 0;background:#f3f8fc}.me-answer.good{background:#e9f8ef;color:#166534}.me-answer.bad{background:#fff0f0;color:#991b1b}@media(max-width:600px){#mock-exam-overlay{padding:8px}.me-card{padding:14px}.me-head{align-items:flex-start}.me-head b{font-size:.86rem}.me-nav{flex-wrap:wrap}.me-stem{font-size:1.04rem}}</style>${html}`}
   function close(){stop();const e=document.getElementById('mock-exam-overlay');if(e)e.remove()} const state=()=>read(STATE_KEY),saveState=v=>write(STATE_KEY,v);
@@ -22,4 +22,67 @@
   function persistReview(){if(session?.kind==='review')write(REVIEW_KEY,{signature:session.signature,index:session.index,ids:session.ids,updatedAt:Date.now()})} function renderReview(){stop();const q=find(session.ids[session.index]),picked=session.answers[q.id],shown=picked!==undefined,items=q.options.map((o,i)=>`<button class="me-choice ${shown&&i===q.answer?'selected':''}" ${shown?'disabled':''} onclick="MockEnglish.reviewAnswer(${i})"><b>${String.fromCharCode(65+i)}.</b> ${nl(o)}</button>`).join('');mount(`<main class="me-card"><div class="me-head"><button class="me-back" onclick="MockEnglish.exitReview()">離開並記錄進度</button><b>複習・第 ${q.paper} 回第 ${q.no} 題</b><span class="me-timer" id="me-clock">${clock(session.remaining)}</span></div><div class="me-progress"><span style="width:${((session.index+1)/session.ids.length*100).toFixed(1)}%"></span></div><div class="me-section">第 ${q.paper} 回・${esc(q.section||'')}</div>${q.asset?`<img class="me-asset" src="${esc(q.asset)}" alt="題目附圖">`:''}${q.table||''}<div class="me-stem">${nl(q.stem)}</div><div class="me-choices">${items}</div>${shown?`<div class="me-answer ${picked===q.answer?'good':'bad'}"><b>${picked===q.answer?'答對了':`正確答案：${String.fromCharCode(65+q.answer)}`}</b><br>${nl(q.explanation||'解析正在依原答案頁校對。')}</div>`:''}<div class="me-nav"><span class="me-note">${session.index+1} / ${session.ids.length}</span><button class="me-btn" ${shown?'':'disabled'} onclick="MockEnglish.reviewNext()">${session.index===session.ids.length-1?'完成複習':'下一題 →'}</button></div></main>`);if(!shown)timer=setInterval(()=>{session.remaining--;const e=document.getElementById('me-clock');if(e)e.textContent=clock(session.remaining);if(session.remaining<=0){stop();reviewAnswer(-1)}},1000)}
   function reviewAnswer(i){stop();const q=find(session.ids[session.index]);session.answers[q.id]=i;const wrong=read(WRONG_KEY),mastered=read(MASTERED_KEY);if(i===q.answer&&wrong[q.id]){wrong[q.id].streak=(wrong[q.id].streak||0)+1;if(wrong[q.id].streak>=5){mastered[q.id]={...wrong[q.id],masteredAt:Date.now()};delete wrong[q.id]}write(WRONG_KEY,wrong);write(MASTERED_KEY,mastered)}renderReview()} function reviewNext(){if(session.index<session.ids.length-1){session.index++;session.remaining=limit(find(session.ids[session.index]).no);persistReview();renderReview()}else{localStorage.removeItem(REVIEW_KEY);reviewMenu()}} function exitReview(){persistReview();home()}
   window.MockEnglish={open:home,close,home,start,chooseAnswer,previous,next,exitExam,reviewMenu,startReview,reviewAnswer,reviewNext,exitReview};
+  // Question speech controls are installed at the shared mock-exam layer, so every
+  // current and future paper uses the same read/stop behavior.
+  let mockSpeechRun=0,mockSpeechQuestionId='';
+  function stopMockSpeech(){
+    mockSpeechRun++;
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }
+  function activeMockQuestion(){
+    if(!session)return null;
+    return session.kind==='exam' ? session.questions[session.index] : find(session.ids[session.index]);
+  }
+  function speakMockQuestion(){
+    const q=activeMockQuestion();
+    if(!q||!('speechSynthesis' in window))return;
+    const run=++mockSpeechRun;
+    window.speechSynthesis.cancel();
+    const text=[q.stem,...q.options.map((option,index)=>`${'ABCD'[index]}. ${option}`)].join('. ')
+      .replace(/\[[A-Z]\]/g,' ').replace(/\s+/g,' ').trim();
+    const chunks=(text.match(/[\u3400-\u9fff]+|[^\u3400-\u9fff]+/g)||[]).map(x=>x.trim()).filter(Boolean);
+    const voices=window.speechSynthesis.getVoices();
+    const english=voices.find(v=>/en[-_]US/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang));
+    const chinese=voices.find(v=>/zh[-_]TW/i.test(v.lang))||voices.find(v=>/^zh/i.test(v.lang));
+    let index=0;
+    const nextPart=()=>{
+      if(run!==mockSpeechRun||index>=chunks.length)return;
+      const part=chunks[index++],isChinese=/[\u3400-\u9fff]/.test(part),voice=new SpeechSynthesisUtterance(part);
+      voice.lang=isChinese?'zh-TW':'en-US';
+      if(isChinese&&chinese)voice.voice=chinese;
+      if(!isChinese&&english)voice.voice=english;
+      voice.rate=isChinese?.9:.78;
+      voice.onend=nextPart;
+      voice.onerror=nextPart;
+      window.speechSynthesis.speak(voice);
+    };
+    nextPart();
+  }
+  function installMockSpeechControls(){
+    const overlay=document.getElementById('mock-exam-overlay');
+    if(!overlay)return;
+    const stem=overlay.querySelector('.me-stem');
+    if(!stem||stem.previousElementSibling?.classList.contains('me-speech-controls'))return;
+    const controls=document.createElement('div');
+    controls.className='me-speech-controls';
+    controls.style.cssText='display:flex;gap:8px;align-items:center;margin:14px 0 4px;flex-wrap:wrap';
+    const speak=document.createElement('button');
+    speak.type='button';speak.textContent='🔊 朗讀題目';speak.title='朗讀題目與選項';
+    speak.style.cssText='border:0;border-radius:9px;padding:8px 11px;background:#e8f2ff;color:#075985;font-weight:800;cursor:pointer';
+    speak.addEventListener('click',speakMockQuestion);
+    const stopButton=document.createElement('button');
+    stopButton.type='button';stopButton.textContent='⏹ STOP';stopButton.title='停止朗讀';
+    stopButton.style.cssText='border:0;border-radius:9px;padding:8px 11px;background:#dc2626;color:#fff;font-weight:900;cursor:pointer';
+    stopButton.addEventListener('click',stopMockSpeech);
+    controls.append(speak,stopButton);
+    stem.before(controls);
+  }
+  new MutationObserver(()=>{
+    const q=activeMockQuestion();
+    if(q&&q.id!==mockSpeechQuestionId){
+      stopMockSpeech();
+      mockSpeechQuestionId=q.id;
+    }
+    installMockSpeechControls();
+  }).observe(document.documentElement,{childList:true,subtree:true});
 })();
