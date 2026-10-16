@@ -8,12 +8,19 @@
   const limit=n=>n<=30?30:60, clock=s=>{const t=Math.max(0,s);return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
   const bank=()=>window.MockEnglishQuestionBank||[], questions=p=>bank().filter(q=>q.paper===p).sort((a,b)=>a.no-b.no), find=id=>bank().find(q=>q.id===id);
   const groupFor=no=>{
-    if(session?.paper===1){
-      if(no>=34&&no<=35)return [34,35];
-      if(no>=36&&no<=38)return [36,38];
-      if(no>=39&&no<=40)return [39,40];
-    }
-    return [[21,24],[25,27],[28,30],[31,33],[34,36],[37,40]].find(([start,end])=>no>=start&&no<=end)||null;
+    if(no>=21&&no<=24)return [21,24];
+    if(no>=25&&no<=27)return [25,27];
+    if(no>=28&&no<=30)return [28,30];
+    if(no<31||!session?.questions)return null;
+    const qs=session.questions.filter(q=>q.no>=31&&q.no<=40).sort((a,b)=>a.no-b.no);
+    const groups=[];let current=null;
+    qs.forEach(q=>{
+      const marker=(String(q.stem||'').match(/^\s*\[([A-D])\]/)||[])[1]||'';
+      const kind=q.table?'table':marker?'marker:'+marker:'continuation';
+      const starts=!current||((kind==='table'&&current.kind!=='table')||(kind.startsWith('marker:')&&current.kind!==kind));
+      if(starts){current={start:q.no,end:q.no,kind};groups.push(current)}else current.end=q.no;
+    });
+    const group=groups.find(g=>no>=g.start&&no<=g.end);return group?[group.start,group.end]:null;
   };
   const groupBase=q=>{const group=groupFor(q.no);return group&&session?.kind==='exam'?session.questions.find(item=>item.no===group[0])||q:q};
   const groupText=q=>{
