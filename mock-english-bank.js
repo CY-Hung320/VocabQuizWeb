@@ -361,6 +361,55 @@ window.MockEnglishQuestionBank.push(
 );
 window.MockEnglishQuestionBank.sort((a,b)=>a.paper-b.paper||a.no-b.no);
 
+// Restore the complete scanned reading passages for Mock Exam 12 (questions 31-40).
+// Keep the original question/options/answers, replacing only truncated stems.
+const mock12ReadingSourceA = `Clerk: Can I help you?
+Molly: Yes. Can I try on this sweater?
+Clerk: Yes. What size are you, please?
+Molly: Size 6 or size 8.
+Clerk: Try a size 8.
+Molly: Where is the fitting room?
+Clerk: It's over there.
+...... Five minutes later ......
+Molly: It fits me well. I think I will take it. How much is it?
+Clerk: It's three thousand dollars.
+Molly: Here is my credit card.
+Clerk: Thank you.`;
+const mock12ReadingSourceB = `Read the form and answer the questions carefully.
+
+Name | Job | Salary | Working hours | Skills
+Helen | clerk | $25,000 | 8 hours | communicate
+Kelly | writer | $32,000 | 6 hours | good at writing stories
+Jenny | salesperson | $50,000 | 10 hours | know how to sell goods
+Sonia | cook | $48,000 | 9 hours | cook and train`;
+const mock12ReadingSourceC = `Mr. Pitt got a note from his secretary after the meeting.
+
+Date: May 2, 2018
+Time: 15:30
+To: Mr. Pitt
+From: Frank Cage
+Contact number: 0900-000-000
+Important Messages
+* He is interested in our product (產品).
+* order amount
+* the price
+* Call him back before 6:00 p.m.
+Written by: Rose`;
+const mock12ReadingRestores = {
+  31: `${mock12ReadingSourceA}\n\nWhere is Molly probably?`,
+  32: `${mock12ReadingSourceA}\n\nWhat does Molly try on?`,
+  33: `${mock12ReadingSourceA}\n\nWhat size does Molly wear?`,
+  34: `${mock12ReadingSourceA}\n\nWhich of the sentences is TRUE?`,
+  35: `${mock12ReadingSourceB}\n\nWho made the most money?`,
+  36: `${mock12ReadingSourceB}\n\nHelen works eight hours a day. What does she do?`,
+  37: `${mock12ReadingSourceB}\n\nWhich of the sentences is TRUE?`,
+  38: `${mock12ReadingSourceC}\n\nWhat does Rose do?`,
+  39: `${mock12ReadingSourceC}\n\nWhy did Mr. Pitt miss this call?`,
+  40: `${mock12ReadingSourceC}\n\nWhich of the sentences is TRUE?`
+};
+window.MockEnglishQuestionBank.filter(q=>q.paper===12 && q.no>=31 && q.no<=40)
+  .forEach(q=>{ q.stem = `[${q.no<=34?'A':q.no<=37?'B':'C'}] ${mock12ReadingRestores[q.no]}`; });
+
 function m11(no, section, stem, options, answer, explanation) {
   return {id:`m11-${String(no).padStart(2,'0')}`,paper:11,no,section,stem,options,answer,explanation};
 }
