@@ -248,3 +248,54 @@ window.MockEnglishQuestionBank = [
   {id:'m6-39',paper:6,no:39,section:'Reading',stem:'[C] How many tips does the writer mention?',options:['One tip.','Two tips.','Three tips.','At least four tips.'],answer:3,explanation:'The passage gives tips about preparing, practicing, arriving early, and clothing.'},
   {id:'m6-40',paper:6,no:40,section:'Reading',stem:'[C] Which of the sentences is TRUE?',options:['If the weather is hot, you can wear a pair of shorts to the interview.',"It's important to show up before the interview.","The writer doesn't talk about preparing.",'Practicing at home will make you nervous.'],answer:1,explanation:'The passage says it is important to show up before the interview.'}
 ];
+
+// Round 7 is kept as text records so every item can use the existing timer,
+// speech, instant feedback, and mock-exam-only review tracking.
+const mockRound7 = (no, section, stem, options, answer, table) => ({
+  id:`m7-${String(no).padStart(2,'0')}`, paper:7, no, section, stem, options, answer,
+  explanation:'Review the wording and choices in this mock-exam question.', ...(table ? {table} : {})
+});
+window.MockEnglishQuestionBank.push(
+  mockRound7(1,'Vocabulary',"A: What are you going to do?\nB: I'm going shopping because Mother's Day is on the _____.",['house','date','station','corner'],3),
+  mockRound7(2,'Vocabulary','Emily: How was your weekend?\nNeil: My parents and my sister went camping. I was _____ at home.',['excited','interested','bored','surprised'],2),
+  mockRound7(3,'Vocabulary','Ted: Is this _____ taken?\nSue: Yes, it is saved.',['seat','bakery','sidewalk','festival'],0),
+  mockRound7(4,'Vocabulary','I went to the _____ to buy a dress for my sister.',['post office','bank','restaurant','mall'],3),
+  mockRound7(5,'Vocabulary',"Don't sing so loudly at the bus station. It's _____.",['honest','embarrassed','hard-working','afraid'],1),
+  mockRound7(6,'Vocabulary','The man is weak, so he is walking _____ on the street.',['quickly','slowly','happily','luckily'],1),
+  mockRound7(7,'Vocabulary','Math is one of my favorite _____. I study it every day.',['habits','drinks','subjects','sports'],2),
+  mockRound7(8,'Vocabulary',"Please turn on the _____. Let's listen to some music.",['refrigerator','oven','radio','washing machine'],2),
+  mockRound7(9,'Vocabulary','Steve plays the violin once a month. He _____ plays it.',['usually','often','never','seldom'],3),
+  mockRound7(10,'Vocabulary','The student _____ his class notes before the test.',['fell','caught','reviewed','climbed'],2),
+  mockRound7(11,'Grammar','The comic book _____ she reads is very interesting.',['who','which','where','what'],1),
+  mockRound7(12,'Grammar',"I'd like to _____ some dumplings and a cup of coffee for dinner.",['have','having','had','to having'],0),
+  mockRound7(13,'Grammar','Ed: Kelly looks great _____ black skirt.\nAnne: I do not think so.',['for','with','at','in'],3),
+  mockRound7(14,'Grammar','Mark is one of _____ handsome men in his office.',['most','more','the most','less'],2),
+  mockRound7(15,'Grammar','The noodles smell _____. Would you like to try some?',['good','well','badly','strangely'],0),
+  mockRound7(16,'Grammar','Kelly enjoys _____ TV in the living room.',['to watch','watching','watches','watch'],1),
+  mockRound7(17,'Grammar','The bread I _____ last night was very delicious, but expensive.',['eaten','to eat','ate','eating'],2),
+  mockRound7(18,'Grammar',"_____ he was tired and sick, he still went to Lisa's birthday party.",['Because','Even though','When','As'],1),
+  mockRound7(19,'Grammar','The apartment _____ by Mr. Roberts in 2017.',['bought','buys','has been bought','was bought'],3),
+  mockRound7(20,'Grammar','The teacher had Mina _____ in her homework now.',['hand','hands','handing','handed'],0)
+);
+window.MockEnglishQuestionBank.push(
+  mockRound7(21,'Cloze-test',"[A] Sean: I'm leaving for a trip to Seattle.\nRita: _____ When are you leaving?",['Have a good time!','Help yourself.','Leave me alone!','Nothing to lose!'],0),
+  mockRound7(22,'Cloze-test','[A] Rita: I _____ to Seattle twice. I really love there.',['went','have been','am going','have gone'],1),
+  mockRound7(23,'Cloze-test','[A] The air is _____, the weather is fine, and the sceneries are beautiful.',['bad','blue','fresh','dirty'],2),
+  mockRound7(24,'Cloze-test',"[A] Rita: Yes. Where are you _____?\nSean: My friend's place.",['hiding','dancing','doing','staying'],3),
+  mockRound7(25,'Cloze-test','[B] Dear Mr. Smith,\nMrs. Brown _____ Happy Store just called to inform you the pink coat you ordered last Wednesday has _____. Please get it before tomorrow. _____ you have any questions, please call 0988-888-888.\nTed\n10:00 a.m. July 15th',['from','to','up','within'],0),
+  mockRound7(26,'Cloze-test','[B] The pink coat you ordered last Wednesday has _____.',['remembered','showed','run','arrived'],3),
+  mockRound7(27,'Cloze-test','[B] _____ you have any questions, please call 0988-888-888.',['Before','If','Whether','Although'],1),
+  mockRound7(28,'Cloze-test','[C] Willy just moved to a new apartment. _____ four restaurants, two supermarkets, two banks and one bookstore in the neighborhood.',['They are','We have','There are','It is'],2),
+  mockRound7(29,'Cloze-test',"[C] Willy's new neighborhood is very _____.",['dangerous','exciting','convenient','tiring'],2),
+  mockRound7(30,'Cloze-test','[C] The bus station is near his apartment. It only _____ him five minutes to walk there.',['takes','spends','costs','pays'],0),
+  mockRound7(31,'Reading',"[A] Adam: You look cute in pink jacket.\nEmma: Thank you. The jacket looks nice.\nAdam: Where did you get the jacket?\nEmma: It's a birthday present from Judy.\nAdam: Who is Judy?\nEmma: She's my cousin. We are very close.\nAdam: Do you know how much the jacket is?\nEmma: Yes, it is around four thousand dollars.\nAdam: Wow. It cost her an arm and a leg.\nEmma: Yes, it was not cheap.\n\nWhere did Emma get the jacket?",['She borrowed from Judy.',"It's a birthday present from Adam.",'She bought it.','Judy gave her the jacket.'],3),
+  mockRound7(32,'Reading','[A] Who is Judy?',["Emma's cousin.","Adam's cousin.","Emma's classmate.","Adam's friend."],0),
+  mockRound7(33,'Reading','[A] How much may the jacket cost?',['Two thousand dollars.','Three thousand and five hundred dollars.','Four thousand and one hundred dollars.','Five thousand dollars.'],2),
+  mockRound7(34,'Reading','[A] What does "cost her an arm and a leg" mean?',['Cheap.','Common.','Expensive.','Special.'],2),
+  mockRound7(35,'Reading','[B] Happy Camp\nDate: April 1 - April 3\nAges: Between 10 and 16 years old\nActivities: Go boating; Go hiking; Horse riding; Painting; Go swimming; Party\nPrice: $3500\nSign up before March 20, and you can take 20% off.\n\nWho can go to Happy Camp?',['Meg. She is 15 years old.','Kelly. She just celebrated her 18th birthday.','Ken. He will be 20 next month.',"Mark. Meg's father."],0),
+  mockRound7(36,'Reading','[B] How much did Lisa pay if she signed in on March 17th?',['Three thousand dollars.','Three thousand and five hundred dollars.','Two thousand and eight hundred dollars.','Seven hundred dollars.'],2),
+  mockRound7(37,'Reading','[B] Which of the sentences is TRUE?',['You can go skiing at the camp.',"It's a winter camp.",'Sign up before March 20, and you can get a discount.','The camp will last two days.'],2),
+  mockRound7(38,'Reading','[C] April 20, 2018\nTo: Mrs. Brown, Manager, Happy Mall\n\nDear Mrs. Brown,\nI received the skirts you sent yesterday afternoon. When I opened the package, I found that you have sent me the wrong skirts.\n\nI had ordered two skirts last week. One is green, and the other is purple. Instead, you sent me two green skirts. I was unhappy.\n\nI am returning them today. Could you send me the right products as soon as possible?\nThank you.\nAlisa Smith\n\nWho wrote this letter?',['The manager of Happy Mall.','Alisa.','Mrs. Brown.',"Alisa's mom."],1),
+  mockRound7(39,'Reading','[C] When did Alisa get the skirts?',['April 19th.','April 20th.','April 21st.',"We don't know."],0),
+  mockRound7(40,'Reading','[C] Which of the sentences is TRUE?',['Mrs. Brown got the skirts.','Alisa wants to change the sizes.','Alisa decides to cancel the order.','Alisa ordered two skirts.'],3)
+);
