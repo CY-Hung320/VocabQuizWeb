@@ -249,6 +249,53 @@ window.MockEnglishQuestionBank = [
   {id:'m6-40',paper:6,no:40,section:'Reading',stem:'[C] Which of the sentences is TRUE?',options:['If the weather is hot, you can wear a pair of shorts to the interview.',"It's important to show up before the interview.","The writer doesn't talk about preparing.",'Practicing at home will make you nervous.'],answer:1,explanation:'The passage says it is important to show up before the interview.'}
 ];
 window.MockEnglishQuestionBank.sort((a,b)=>a.paper-b.paper||a.no-b.no);
+
+function m10(no, section, stem, options, answer, explanation) {
+  return {id:`m10-${String(no).padStart(2,'0')}`,paper:10,no,section,stem,options,answer,explanation};
+}
+window.MockEnglishQuestionBank.push(
+  m10(1,'Vocabulary','Sandy: Did you watch the basketball game last night?\nSam: Yes. It was very _____. I really loved it.',['colorful','sleepy','delicious','exciting'],3,'籃球賽讓人喜愛，最適合用 exciting（刺激的）。'),
+  m10(2,'Vocabulary','What time will the Christmas _____ start?',['party','game','story','gift'],0,'Christmas party 是「聖誕派對」。'),
+  m10(3,'Vocabulary','The old man was walking _____ through the snow.',['slowly','truly','lovely','luckily'],0,'在雪地中走路，slowly（慢慢地）符合語意。'),
+  m10(4,'Vocabulary','Gary will _____ at the airport at six o’clock.',['make','arrive','dance','remember'],1,'arrive at + 地點，表示抵達。'),
+  m10(5,'Vocabulary','I felt _____ about falling down in front of my classmates.',['lucky','honest','pretty','embarrassed'],3,'在同學面前跌倒會感到 embarrassed（尷尬的）。'),
+  m10(6,'Vocabulary','A stranger _____ the little girl to the store.',['jumped','followed','printed','forgot'],1,'follow + 人 + to + 地點，表示跟著某人到某地。'),
+  m10(7,'Vocabulary','Helen is the prettiest girl in our class. No one _____ looks as pretty as she does.',['else','both','other','another'],0,'no one else 表示「沒有其他人」。'),
+  m10(8,'Vocabulary','The coach planned to _____ two pounds a week.',['spend','lose','understand','turn'],1,'lose two pounds 表示減掉兩磅。'),
+  m10(9,'Vocabulary','The man was so _____ that he saved the little girl.',['honest','brave','favorite','afraid'],1,'救人需要勇敢，brave 最符合句意。'),
+  m10(10,'Vocabulary','Tina lives on the tenth _____. She takes the elevator every day.',['weight','step','homework','floor'],3,'第十樓是 the tenth floor。'),
+  m10(11,'Grammar','Molly seldom washes the dishes, and Judy _____.',['does too','does so','neither does','doesn’t either'],3,'seldom 帶否定語意，附和否定用 doesn’t either。'),
+  m10(12,'Grammar','I was born _____ January 20, 1999.',['in','at','on','of'],2,'特定日期前用 on。'),
+  m10(13,'Grammar','If I were you, I _____ on a test.',['cheated','won’t cheat','wouldn’t cheat','may not cheat'],2,'與現在事實相反的假設：If I were you, I would not + 原形動詞。'),
+  m10(14,'Grammar','_____ Meg _____ Mina is a student. They are both clerks.',['Neither; nor','Either; or','Both; and','Neither; or'],0,'兩人都不是學生，應用 Neither A nor B。'),
+  m10(15,'Grammar','Don’t go out alone at midnight, _____?',['does it','will you','would you','do you'],1,'否定祈使句的附加問句通常用 will you?'),
+  m10(16,'Grammar','It took two hours _____ her painting.',['finishing','to finish','finish','finished'],1,'It takes + 時間 + to V，表示花多少時間做某事。'),
+  m10(17,'Grammar','Christmas is coming. Willy _____ decorate the house next week.',['is going','goes to','is going to','going to'],2,'be going to + 原形動詞表示計畫或未來。'),
+  m10(18,'Grammar','Bill and Neil are neighbors. _____ of them are from the USA.',['One','Some','All','Both'],3,'兩人都來自美國，用 Both。'),
+  m10(19,'Grammar','The man is rich enough _____ the island.',['to buy','buying','bought','bought'],0,'形容詞 + enough + to V。'),
+  m10(20,'Grammar','This is the best book _____ I have ever read.',['that','which','who','where'],0,'先行詞有最高級 best 時，關係代名詞常用 that。'),
+  m10(21,'Cloze-test','Emma: Mr. Cage, can I talk to you?\nMr. Cage: Sure. Have a _____, please.',['pen','seat','dream','video'],1,'Have a seat, please. 表示「請坐」。'),
+  m10(22,'Cloze-test','Mr. Cage: We need to discuss your job performance last _____.',['next','each','every','week'],3,'談論過去的工作表現，last week 合乎語意。'),
+  m10(23,'Cloze-test','Mr. Cage: You were _____ for work two times.',['careful','brave','late','glad'],2,'be late for work 表示上班遲到。'),
+  m10(24,'Cloze-test','Mr. Cage: You also made some _____.',['mistakes','wishes','fun','doctors'],0,'make mistakes 是固定搭配。'),
+  m10(25,'Cloze-test','Meg has two roommates, Sonia and Alisa. _____ Sonia is friendly and outgoing, she is very popular.',['Although','Since','If','Before'],1,'句子說明 Sonia 受歡迎的原因，Since 表示「因為」。'),
+  m10(26,'Cloze-test','Unlike Sonia, Alisa is quiet and _____.',['noisy','happy','exciting','shy'],3,'和 outgoing 相反且符合安靜的特質是 shy。'),
+  m10(27,'Cloze-test','Alisa does not know how to talk to people, so she has _____ friends.',['many','lots of','a few','much'],2,'friends 是可數名詞；語意是朋友不多，用 a few。'),
+  m10(28,'Cloze-test','Emily’s birthday was coming, so Wendy _____ her a green bag.',['bought','cost','imagined','protected'],0,'buy someone something 表示買某物送給某人。'),
+  m10(29,'Cloze-test','The bag _____ her two thousand dollars.',['cost','paid','spent','took'],0,'物品作主詞表示價格時用 cost。'),
+  m10(30,'Cloze-test','Besides, she spent five thousand dollars _____ two pairs of shoes.',['at','with','within','on'],3,'spend money on + 事物。'),
+  m10(31,'Reading','[A] Neil just moved into a new house, but he is unhappy. His neighbors are unfriendly. When he listens to music, Mrs. Wang knocks on his door and says, “Turn down the volume, or I’ll call the police.”\n\nWhy is Neil unhappy?',['He failed a test.','His neighbors are unfriendly.','He is afraid of moving.','He has no money.'],1,'文章直接說 Neil 的鄰居不友善。'),
+  m10(32,'Reading','[A] Neil just moved into a new house. Mrs. Wang knocks on his door when he listens to music.\n\nWhy does Mrs. Wang knock on Neil’s door?',['To say hello.','To use his phone.','To call the police.','To ask him to turn down the volume.'],3,'Mrs. Wang 要他把音量轉小。'),
+  m10(33,'Reading','[A] Neil just moved into a new house, but his neighbors are unfriendly.\n\nWhich is true about Neil?',['He knocked on Mrs. Wang’s door.','He just moved into a new apartment.','His neighbors are not friendly.','He gets along well with his neighbors.'],2,'文章明確說他的鄰居不友善。'),
+  m10(34,'Reading','[B] Mark’s Home\nMon.–Sat.: 11:00–20:00\nSun.: 10:00–20:00\nAll you can eat and drink. Over 100 items.\n$500 / adult; $350 / child\nClosed on the first Sunday of every month.\n\nWhat is Mark’s Home?',['A museum.','A supermarket.','A swimming pool.','A restaurant.'],3,'提供吃到飽與飲料的場所是餐廳。'),
+  m10(35,'Reading','[B] Mark’s Home is open from 11:00 to 20:00 on Friday.\n\nHow many hours is it open on Friday?',['Nine.','Eight.','Seven.','Ten.'],0,'從 11:00 到 20:00，共九小時。'),
+  m10(36,'Reading','[B] Mark’s Home is closed on the first Sunday of every month.\n\nWhich is true?',['It opens every day of the year.','It is closed on the first Sunday of each month.','Children pay $500.','It opens at 9:00 on Sunday.'],1,'公告明確寫著每月第一個星期日休息。'),
+  m10(37,'Reading','[C] Cindy’s diary\nMay 12, sunny: I went swimming with Lisa. Then we went shopping. I bought a skirt and a bag for $3,000.\nMay 14, Saturday, rainy: Our picnic was canceled, so I stayed home.\nMay 15: It was my birthday. We had dinner at a restaurant.\nMay 17, cloudy: I forgot my homework.\n\nWhat was the weather like on Saturday?',['Sunny.','Cloudy.','Windy.','Rainy.'],3,'日記寫 May 14（星期六）是 rainy。'),
+  m10(38,'Reading','[C] May 14 was Saturday. What day was May 17?',['Monday.','Tuesday.','Wednesday.','Thursday.'],1,'5 月 14 日是星期六，5 月 17 日是星期二。'),
+  m10(39,'Reading','[C] Cindy wrote: “I went swimming with Lisa on May 12.”\n\nWhat did Lisa do on May 12?',['She went swimming.','She went on a picnic.','She went camping.','She went jogging.'],0,'日記說 Cindy 與 Lisa 一起游泳。'),
+  m10(40,'Reading','[C] Cindy’s diary records swimming on May 12, staying home on rainy Saturday, and her birthday on May 15.\n\nWhich is NOT true?',['Cindy stayed home on Saturday.','Cindy can swim.','Cindy bought a coat on May 12.','Her birthday was on May 15.'],2,'May 12 買的是裙子和包包，不是外套。')
+);
+window.MockEnglishQuestionBank.sort((a,b)=>a.paper-b.paper||a.no-b.no);
 function m9(n,s,o,a){return {id:`m9-${String(n).padStart(2,'0')}`,paper:9,no:n,section:n<11?'Vocabulary':n<21?'Grammar':n<31?'Cloze-test':'Reading',stem:s,options:o,answer:a,explanation:'Review this mock-exam question and its choices.'};}
 window.MockEnglishQuestionBank.push(
 m9(1,'Ted, you should do your homework more carefully. Your answers are not _____.',['giant','dark','wrong','correct'],3),m9(2,'Emily got up late this morning. _____, her boss was not in when she arrived.',['Angrily','Truly','Luckily','Slowly'],2),m9(3,'Beth: Please stop making a lot of _____. I am studying.',['noise','hair','mouth','paper'],0),m9(4,'He just ate two hamburgers. He is _____ now.',['far','full','filled','funny'],1),m9(5,'The coffee is too bitter. Please put some _____ in it.',['sugar','salt','ice','pepper'],0),m9(6,'The book is about some stories that _____ in Europe.',['stole','hurried','pulled','happened'],3),m9(7,'Stanley is happy every day because he thinks life is _____.',['colorful','tiring','terrible','dangerous'],0),m9(8,'_____ up. We are almost late for work.',['Begin','Hurry','Practice','Become'],1),m9(9,'He is interested in drawings and paintings. He visits the _____ very often.',['exercise','rest room','knowledge','museum'],3),m9(10,'His father works in a famous _____. He is satisfied with his pay.',['sky','ground','factory','interview'],2),m9(11,'Fiona: _____ is Maggie doing in her bedroom?\nKen: She is doing her homework.',['Where','What','When','How'],1),m9(12,'Can you tell me _____ to get to the airport?\nBefore eight. Do not be late.',['when','how','where','why'],0),m9(13,'He wants to know _____ Emma will come or not.',['because','although','after','whether'],3),m9(14,'This is the building _____ Karry works.',['in','which','where','that'],2),m9(15,"Because Frank _____ a letter to Molly for a long time, he called her last Friday.",["doesn't write","hasn't write","didn't write","hadn't written"],3),m9(16,'Amy went to bed already. She will have an important test _____.',['yesterday','tomorrow','this morning','two days ago'],1),m9(17,'The student was made _____ out the garbage by the teacher.',['to throw','throw','throwing','threw'],0),m9(18,"Meg argued with Henry because her thoughts didn't _____ his.",['nod at','agree with','shout at','look up'],1),m9(19,'The CD player was _____ expensive for Henry _____ buy.',['so; that','too; that','too; to','very; to'],2),m9(20,'Helen: What did you see?\nJack: I saw Maggie _____ at her younger brother.',['shouting','to shout','shouted','to shouting'],0)
