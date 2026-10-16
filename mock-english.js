@@ -7,7 +7,14 @@
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), nl=v=>esc(v).replace(/\n/g,'<br>');
   const limit=n=>n<=30?30:60, clock=s=>{const t=Math.max(0,s);return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
   const bank=()=>window.MockEnglishQuestionBank||[], questions=p=>bank().filter(q=>q.paper===p).sort((a,b)=>a.no-b.no), find=id=>bank().find(q=>q.id===id);
-  const groupFor=no=>[[21,24],[25,27],[28,30],[31,33],[34,36],[37,40]].find(([start,end])=>no>=start&&no<=end)||null;
+  const groupFor=no=>{
+    if(session?.paper===1){
+      if(no>=34&&no<=35)return [34,35];
+      if(no>=36&&no<=38)return [36,38];
+      if(no>=39&&no<=40)return [39,40];
+    }
+    return [[21,24],[25,27],[28,30],[31,33],[34,36],[37,40]].find(([start,end])=>no>=start&&no<=end)||null;
+  };
   const groupBase=q=>{const group=groupFor(q.no);return group&&session?.kind==='exam'?session.questions.find(item=>item.no===group[0])||q:q};
   const groupText=q=>{
     const group=groupFor(q.no),base=groupBase(q);if(!group)return base.stem;
