@@ -173,6 +173,9 @@
     if(q&&q.id!==mockSpeechQuestionId){
       stopMockSpeech();
       mockSpeechQuestionId=q.id;
+      // New questions are read once automatically. The visible button remains
+      // available afterwards for an on-demand replay.
+      setTimeout(()=>{if(activeMockQuestion()?.id===q.id)speakMockQuestion();},0);
     }
     installMockSpeechControls();
     applyMockAnswerFeedback();
