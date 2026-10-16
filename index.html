@@ -1565,7 +1565,8 @@ function renderQuestion() {
     document.getElementById('q-word').innerHTML = `<div class="q-sentence">${sentence.replace('___','<span class="blank">?</span>')}</div>`;
     opts = shuffle([...wrong, word]);
     correctIdx = opts.indexOf(word);
-    optDisplay = opts.map(o => `${o[0]} (${o[1]})`);
+    // 題幹是英文句子，選項只保留英文，避免中英混列。
+    optDisplay = opts.map(o => o[0]);
 
   } else if (type === 'situation') {
     // 情境應用: show Chinese situation, pick English
@@ -1574,7 +1575,8 @@ function renderQuestion() {
     document.getElementById('q-word').innerHTML = `<div class="q-situation-box">🎭 ${sit}</div>`;
     opts = shuffle([...wrong, word]);
     correctIdx = opts.indexOf(word);
-    optDisplay = opts.map(o => `${o[0]} (${o[1]})`);
+    // 題幹是中文情境，選項只保留英文，避免中英混列。
+    optDisplay = opts.map(o => o[0]);
 
   } else {
     // default reading: show Chinese, pick English
