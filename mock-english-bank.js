@@ -250,6 +250,51 @@ window.MockEnglishQuestionBank = [
 ];
 window.MockEnglishQuestionBank.sort((a,b)=>a.paper-b.paper||a.no-b.no);
 
+function m12(no, section, stem, options, answer, explanation) { return {id:`m12-${String(no).padStart(2,'0')}`,paper:12,no,section,stem,options,answer,explanation}; }
+window.MockEnglishQuestionBank.push(
+ m12(1,'Vocabulary','Emma: What did you do yesterday?\nTony: I _____ my uncle.',['typed','decided','visited','celebrated'],2,'visit a person 表示拜訪某人。'),
+ m12(2,'Vocabulary',"It is common to give a red _____ on Chinese New Year's Eve.",['envelope','bedroom','paper','garage'],0,'red envelope 是紅包。'),
+ m12(3,'Vocabulary','The dining room was _____ with posters.',['decorated','touched','invited','watched'],0,'be decorated with 表示用…裝飾。'),
+ m12(4,'Vocabulary','Did you _____ that Tommy had left the room?',['play','notice','review','repeat'],1,'notice that 表示注意到。'),
+ m12(5,'Vocabulary','Ben won the speech contest. His parents are _____ of him.',['sorry','afraid','proud','embarrassed'],2,'be proud of 表示以…為榮。'),
+ m12(6,'Vocabulary','This plane can carry at least 200 _____.',['passengers','mountains','sports','programs'],0,'飛機載運的是 passengers（乘客）。'),
+ m12(7,'Vocabulary',"Neil: Are you _____? I don't believe it.\nSally: No, just kidding.",['popular','friendly','funny','serious'],3,'just kidding 表示開玩笑，問句是 Are you serious?'),
+ m12(8,'Vocabulary','We plan to go _____ climbing this weekend. Are you coming?',['lake','river','mountain','earth'],2,'go mountain climbing 表示去爬山。'),
+ m12(9,'Vocabulary','Benny is a _____ businessman. He makes a lot of money every year.',['dangerous','strange','successful','weak'],2,'能賺很多錢的生意人是 successful。'),
+ m12(10,'Vocabulary','Meg ate too many desserts, so she had an upset _____.',['weight','stomach','finger','hair'],1,'have an upset stomach 表示胃不舒服。'),
+ m12(11,'Grammar','Rita: _____ grape juice did he drink?\nAllen: He drank three glasses.',['How many','How often','How far','How much'],3,'juice 不可數，問數量用 How much。'),
+ m12(12,'Grammar',"Lisa's room is larger than _____.",['me','my','I','mine'],3,'than 後面需用名詞所有格 mine，代表 my room。'),
+ m12(13,'Grammar','Gary sometimes watches TV after _____ his homework.',['finishing','to finish','finishes','finish'],0,'after 後接 V-ing。'),
+ m12(14,'Grammar','There are _____ students on the playground.',['a little','much','many','little'],2,'students 是可數複數名詞，用 many。'),
+ m12(15,'Grammar',"Playing the violin _____ one of Willy's hobbies.",['are','will','be','is'],3,'動名詞片語作主詞，動詞用單數 is。'),
+ m12(16,'Grammar',"Sally never drinks a cup of coffee, _____?",["doesn't she",'does she','will she',"isn't she"],1,'never 帶否定，附加問句用肯定 does she。'),
+ m12(17,'Grammar','Rita: Where is your roommate?\nTed: She _____ to the USA. She will come back next week.',['has been','has gone','went','goes'],1,'人還在目的地、尚未回來，用 has gone to。'),
+ m12(18,'Grammar','If Willy _____ the truth, his parents might not have argued.',['tells','will tell','had told','has told'],2,'與過去事實相反：If + had p.p., might have p.p.。'),
+ m12(19,'Grammar','_____ are many notebooks on the desk. You can take one.',['There','They','He','We'],0,'There are 表示「有」。'),
+ m12(20,'Grammar','Tina forgot _____ the mail in the post office. In fact, she sent it already.',['send','sending','to send','sent'],1,'forget + V-ing 表示忘記已經做過的事。'),
+ m12(21,'Cloze-test',"Lisa: Good morning. How may I help you?\nDon: I'm calling from room no. 520. I'd like to order _____ in my room.",['toys','newspaper','numbers','breakfast'],3,'客房服務點餐是 order breakfast。'),
+ m12(22,'Cloze-test','Don: Send a hamburger and _____ coffee, please.',['a loaf of','a cup of','a piece of','a dish of'],1,'咖啡的量詞用 a cup of。'),
+ m12(23,'Cloze-test','Don: _____ would that be?',['How long','How much','How far','How often'],0,'詢問送達需要多久，用 How long。'),
+ m12(24,'Cloze-test','Lisa: Your meal will _____ in thirty minutes.',['delivers','delivering','be delivered','delivered'],2,'meal 是被送達，用未來被動式 will be delivered。'),
+ m12(25,'Cloze-test','Kelly likes to play the piano and go jogging when she has _____ time.',['bright','busy','funny','free'],3,'free time 是空閒時間。'),
+ m12(26,'Cloze-test','She is _____ playing the piano because she has played it for many years.',['good at','surprised at','afraid of','tired of'],0,'be good at + V-ing 表示擅長。'),
+ m12(27,'Cloze-test','Kelly’s younger brother Alan likes to play the piano, _____.',['either','neither','too','nor'],2,'肯定句句尾的「也」用 too。'),
+ m12(28,'Cloze-test','Beth did not go to bed until 2 a.m. because she was worried _____ her job.',['at','about','for','with'],1,'be worried about 表示擔心。'),
+ m12(29,'Cloze-test',"Beth felt so embarrassed _____ she couldn't say any word.",['that','to','for','which'],0,'so + 形容詞 + that 子句。'),
+ m12(30,'Cloze-test','After lunch, she tried _____ to her boss, but he left the office already.',['explaining','explain','explained','to explain'],3,'try to V 表示嘗試做某事。'),
+ m12(31,'Reading','[A] Molly tries on a sweater in a store. It fits her well. She decides to take it and pays by credit card.\n\nWhere is Molly probably?',['In a bookstore.','In a shopping center.','In a bank.','In a post office.'],1,'試穿毛衣的地方是購物中心／服飾店。'),
+ m12(32,'Reading','[A] Molly asks, “Can I try on this sweater?”\n\nWhat does Molly try on?',['A skirt.','A shirt.','A coat.','A sweater.'],3,'對話直接說 sweater。'),
+ m12(33,'Reading','[A] The clerk tells Molly, “Try a size 8.” Molly says it fits her well.\n\nWhat size does Molly wear?',['Size 6.','Size 8.','Size 10.','Size 12.'],1,'她試穿的八號合身。'),
+ m12(34,'Reading','[A] Molly decides to buy a sweater for $3,000 and gives the clerk her credit card.\n\nWhich sentence is TRUE?',['The sweater is too small.',"Molly doesn't buy the sweater.",'Molly will pay with a credit card.','The sweater is less than $3,000.'],2,'她決定購買，並以信用卡付款。'),
+ m12(35,'Reading','[B] Job form\nHelen: clerk, $25,000, 8 hours, communicate\nKelly: writer, $32,000, 6 hours, writing stories\nJenny: salesperson, $50,000, 10 hours, sell goods\nSonia: cook, $48,000, 9 hours, cook and train\n\nWho made the most money?',['Helen','Kelly','Jenny','Sonia'],2,'Jenny 的薪資 $50,000 最高。'),
+ m12(36,'Reading','[B] Helen works eight hours a day. What does she do?',['She is a clerk.','She is a writer.','She is a salesperson.','She is a cook.'],0,'表格中 Helen 的職業是 clerk。'),
+ m12(37,'Reading','[B] Which sentence is TRUE?',['Kelly works 8 hours a day.','Jenny is a writer.','Helen makes more money than Jenny does.','Sonia is good at cooking.'],3,'Sonia 的技能欄是 cook and train，符合擅長烹飪。'),
+ m12(38,'Reading','[C] Mr. Pitt receives a note written by Rose, his secretary. Frank Cage left a contact number and is interested in the company product.\n\nWhat does Rose do?',['A clerk.','A driver.','A waitress.','A secretary.'],3,'題幹直接說 Rose 是 Mr. Pitt 的秘書。'),
+ m12(39,'Reading','[C] Mr. Pitt got the note from his secretary after the meeting.\n\nWhy did Mr. Pitt miss this call?',['He was in the meeting.','He was out for lunch.','He was sick.',"He didn't want to talk to Mr. Cage."],0,'題幹說明便條是在會議後取得。'),
+ m12(40,'Reading','[C] Frank Cage is interested in the products and asks about order amount and price. His contact number is on the note.\n\nWhich sentence is TRUE?',['Frank wrote this note.','Rose is interested in the products.','Frank may give out an order.','Frank did not leave his cellphone number.'],2,'Frank 對產品有興趣並詢問訂購資訊，可能下單。')
+);
+window.MockEnglishQuestionBank.sort((a,b)=>a.paper-b.paper||a.no-b.no);
+
 function m11(no, section, stem, options, answer, explanation) {
   return {id:`m11-${String(no).padStart(2,'0')}`,paper:11,no,section,stem,options,answer,explanation};
 }
