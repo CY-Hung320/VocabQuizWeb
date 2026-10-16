@@ -250,6 +250,53 @@ window.MockEnglishQuestionBank = [
 ];
 window.MockEnglishQuestionBank.sort((a,b)=>a.paper-b.paper||a.no-b.no);
 
+function m11(no, section, stem, options, answer, explanation) {
+  return {id:`m11-${String(no).padStart(2,'0')}`,paper:11,no,section,stem,options,answer,explanation};
+}
+window.MockEnglishQuestionBank.push(
+  m11(1,'Vocabulary',"Gary: Where are you going?\nLisa: I'm going to the train _____.",['bookstore','bank','station','balcony'],2,'train station 是火車站。'),
+  m11(2,'Vocabulary',"He doesn't know how to wash the clothes in _____.",['a washing machine','a refrigerator','a radio','an oven'],0,'洗衣服要使用 washing machine。'),
+  m11(3,'Vocabulary','Remember to _____ these books to the library today.',['grow','laugh','return','hurt'],2,'把書還給圖書館用 return。'),
+  m11(4,'Vocabulary','The man _____ finished his work before the deadline. He was so happy.',['around','quite','never','finally'],3,'finally 表示終於完成。'),
+  m11(5,'Vocabulary',"Sandra's right hand _____. She can't ride a motorcycle.",['decides','hurts','flew','throws'],1,'手受傷應用 hurts。'),
+  m11(6,'Vocabulary','Sandy: Where is Thomas?\nSteve: He is playing on the _____.',['envelope','stomach','playground','sky'],2,'在遊樂場玩是 play on the playground。'),
+  m11(7,'Vocabulary','The air in the mountains is very _____, so he often goes mountain climbing.',['strange','convenient','fresh','low'],2,'山上的空氣很清新，用 fresh。'),
+  m11(8,'Vocabulary','Please turn off the _____ before going to bed.',['plane','lamp','door','letter'],1,'睡前關燈是 turn off the lamp。'),
+  m11(9,'Vocabulary','Judy lives in a very _____ apartment, so she enjoys staying at home.',['young','serious','handsome','comfortable'],3,'令人喜歡待在家的公寓是 comfortable。'),
+  m11(10,'Vocabulary','The _____ checked Meg in, but he forgot to give her a key.',['clerk','cook','singer','customer'],0,'旅館為客人辦理入住的是 clerk。'),
+  m11(11,'Grammar','The manager _____ a meeting every day. He is really busy.',['has','has had','is having','had'],0,'every day 表示習慣動作，用現在簡單式 has。'),
+  m11(12,'Grammar',"The pretty girl _____ at the train station is Frank's new neighbor.",['that we saw her','we saw her','who saw','we saw'],3,'關係子句省略受格關係代名詞：the girl (that) we saw。'),
+  m11(13,'Grammar',"Jill: _____ is the weather like in New York in winter?\nFred: It's snowy.",['How','Why','What','Where'],2,'詢問天氣的固定句型是 What is the weather like?'),
+  m11(14,'Grammar','_____ of the dresses on the bed is made in Italy.',['Most','A lot','One','Many'],2,'one of + 複數名詞，動詞用單數 is。'),
+  m11(15,'Grammar','Sonia works hard every day, and _____.',['so does Emma','Emma does so','neither does Emma','so is Emma'],0,'肯定附和：so + 助動詞 + 主詞。'),
+  m11(16,'Grammar',"Brad didn't tell the truth. _____, he told a lie.",['In fact','But also','However','As a result'],0,'後句說明前句的事實，用 In fact。'),
+  m11(17,'Grammar','_____ in the park is one of Mr. Jordan’s hobbies.',['Ran','Running','Run','Has ran'],1,'動名詞 Running 作主詞。'),
+  m11(18,'Grammar','There are two bookstores in the department store. The one on the second floor sells magazines, but _____ doesn’t.',['the others','another','other','the other'],3,'兩者中的另一個用 the other。'),
+  m11(19,'Grammar',"Molly didn't answer the phone _____ she fell asleep.",['although','since','before','if'],1,'因為睡著而沒接電話，用 since 表原因。'),
+  m11(20,'Grammar','Mark: Yes. She is _____ girl I have ever seen in the world.',['more beautiful','beautiful','the most beautiful','most beautiful'],2,'範圍比較用最高級 the most beautiful。'),
+  m11(21,'Cloze-test','Dad: You came home late today.\nSally: My car _____ down, and I took it to the shop.',['broke','skipped','sat','looked'],0,'break down 表示車子故障。'),
+  m11(22,'Cloze-test','Dad: Oh, I see. _____ do you go to work tomorrow?\nSally: By bus.',['Why','How','Where','When'],1,'回答 By bus，問交通方式用 How。'),
+  m11(23,'Cloze-test','Sally: In fact, I have never _____ the bus.',['take','took','taking','taken'],3,'have never + 過去分詞，take 的過去分詞是 taken。'),
+  m11(24,'Cloze-test','Dad: _____ You can drive my car to work.',['Of course.','Sounds great.','Don’t worry.','Hurry up.'],2,'安慰對方並提出辦法，用 Don’t worry。'),
+  m11(25,'Cloze-test','Frank is 16 years old. He just _____ from junior high school this year.',['remembered','erased','graduated','listened'],2,'從國中畢業用 graduated from。'),
+  m11(26,'Cloze-test','He was starting senior high school. It was his _____ day of school.',['first','last','delicious','pink'],0,'剛開始高中，是第一天。'),
+  m11(27,'Cloze-test','Frank was shy and quiet, so he felt worried. He _____ everything would be fine.',['missed','caught','pointed','hoped'],3,'hope + 子句表示希望。'),
+  m11(28,'Cloze-test',"Ken and Lisa had a big dinner _____ Valentine's Day.",['in','on','at','with'],1,'特定節日前用 on。'),
+  m11(29,'Cloze-test','He found his front door _____.',['recorded','jumped','touched','broken'],3,'門被破壞，應為 broken。'),
+  m11(30,'Cloze-test','His TV and notebook were missing. Then Ken called the _____.',['police','waiter','clerk','writer'],0,'遭竊後應該報警。'),
+  m11(31,'Reading','[A] Emma: Steve didn’t show up in the meeting. The manager looked angry.\nAdam: He had a car accident this morning and was sent to the hospital.\n\nSteve didn’t show up in the meeting because _____.',['he asked for a sick leave','he had a car accident','he got up late','he forgot the meeting'],1,'對話指出 Steve 早上出了車禍。'),
+  m11(32,'Reading','[A] Steve didn’t show up in the meeting. The manager looked angry.\n\nWhy did the manager look angry this morning?',['He was late for work.','The meeting was too boring.','Emma didn’t pick up his phone.','Steve didn’t show up in the meeting.'],3,'經理生氣是因為 Steve 沒出席會議。'),
+  m11(33,'Reading','[A] Steve had a car accident and was sent to the hospital.\n\nWhich sentence is TRUE?',['Emma is the manager.','Steve showed up in the meeting this morning.','Steve was in the hospital.','The manager had a car accident.'],2,'Steve 車禍後被送到醫院。'),
+  m11(34,'Reading','[B] Class A has 20 boys and 15 girls.\nBoys: Milk 40%, Juice 30%, Coke 25%, Coffee 5%.\nGirls: Milk 40%, Coffee 26.7%, Coke 20%, Juice 13.3%.\n\nHow many students like to drink milk?',['Eight.','Fourteen.','Sixteen.','Eighty.'],1,'男生 20×40%=8，女生 15×40%=6，共 14 人。'),
+  m11(35,'Reading','[B] Class A has 20 boys and 15 girls.\nBoys: Milk 40%, Juice 30%, Coke 25%, Coffee 5%.\nGirls: Milk 40%, Coffee 26.7%, Coke 20%, Juice 13.3%.\n\n_____ is the most popular drink in Class A.',['Juice','Coffee','Milk','Coke'],2,'牛奶共有 14 人，最多。'),
+  m11(36,'Reading','[B] Class A has 20 boys and 15 girls. Boys: Coffee 5%; Girls: Coffee 26.7%.\n\nWhich sentence is TRUE?',['No one in Class A likes juice.','One boy student likes coffee.','Juice is more popular than Coke.','There are forty students in Class A.'],1,'20 位男生的 5% 是 1 位。'),
+  m11(37,'Reading','[C] William writes to Rose: “If you have time, we can get to Lucky One this Saturday afternoon. How about meeting at five? Let’s talk over dinner.”\n\nWhat is Lucky One?',['A restaurant.','A post office.','A bank.','A bookstore.'],0,'約在 Lucky One 吃晚餐，所以是餐廳。'),
+  m11(38,'Reading','[C] William wrote the letter on October 1, 2018. He says it has been two weeks since Rose came to his birthday party.\n\nWhen is William’s birthday?',['In August.','In September.','In October.','In November.'],1,'10 月 1 日往前兩週約在 9 月。'),
+  m11(39,'Reading','[C] Rose left William’s birthday party angrily because they argued over a little thing.\n\nWhy did Rose leave the party angrily?',['She was not satisfied with the party.','She lost her purse.','She argued with William.','William didn’t talk to her.'],2,'信中直接說兩人為小事爭論。'),
+  m11(40,'Reading','[C] William says he tried to call Rose, but she did not pick up.\n\nWhich sentence is TRUE?',['Rose wrote this letter.','William did not call Rose.','Rose felt sorry for William.','William tried to contact Rose.'],3,'William 曾嘗試打電話給 Rose。')
+);
+window.MockEnglishQuestionBank.sort((a,b)=>a.paper-b.paper||a.no-b.no);
+
 function m10(no, section, stem, options, answer, explanation) {
   return {id:`m10-${String(no).padStart(2,'0')}`,paper:10,no,section,stem,options,answer,explanation};
 }
