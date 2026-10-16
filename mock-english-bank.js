@@ -588,3 +588,93 @@ const mockExam2ReadingFixes=[
 mockExam2ReadingFixes.forEach(f=>{const q=window.MockEnglishQuestionBank.find(x=>x.id===f.id);if(q)Object.assign(q,f)});
 const mockExam2Q36=window.MockEnglishQuestionBank.find(x=>x.id==='m2-36');
 if(mockExam2Q36)mockExam2Q36.stem='There are _____ people who go to bed late because they need to do their homework.';
+
+// Reading questions in the same group must retain the complete source passage.
+// Some earlier records only contained a short paraphrase on questions after the
+// first one; copy the longest scanned transcription to every question in that group.
+const mockReadingGroups={
+  1:[[31,33],[34,35],[36,38],[39,40]],2:[[31,33],[34,35],[36,37],[38,40]],
+  3:[[31,32],[33,34],[35,37],[38,40]],4:[[31,33],[34,37],[38,40]],
+  5:[[31,33],[34,36],[37,40]],6:[[31,33],[34,37],[38,40]],
+  7:[[31,34],[35,37],[38,40]],8:[[31,34],[35,37],[38,40]],
+  9:[[31,34],[35,37],[38,40]],10:[[31,33],[34,36],[37,40]],
+  11:[[31,33],[34,36],[37,40]],12:[[31,34],[35,37],[38,40]],
+  13:[[31,32],[33,37],[38,40]]
+};
+Object.keys(mockReadingGroups).forEach(paper=>mockReadingGroups[paper].forEach(([from,to])=>{
+  const group=window.MockEnglishQuestionBank.filter(q=>q.paper===+paper&&q.no>=from&&q.no<=to);
+  if(group.some(q=>q.table)) return;
+  const sourceQuestion=group.reduce((a,b)=>(b.stem||'').length>(a.stem||'').length?b:a);
+  if(!sourceQuestion || (sourceQuestion.stem||'').length<140) return;
+  const source=sourceQuestion.stem.replace(/^\[[A-Z]\]\s*/,'').replace(/\n\n[^\n]*\??\s*$/,'');
+  group.forEach(q=>{
+    const current=(q.stem||'').replace(/^\[[A-Z]\]\s*/,'');
+    const question=current.includes('\n\n')?current.slice(current.lastIndexOf('\n\n')+2):current;
+    const marker=q.stem.match(/^\[[A-Z]\]/)?.[0]||'';
+    q.stem=`${marker}\n${source}\n\n${question}`;
+  });
+}));
+
+// Mock Exam 9: restore the full scanned source boxes for all reading questions.
+const mock9SourceA=`Uncle Ted
+Sunday~Saturday
+7:00~22:00
+
+Combo (套餐) A
+Chicken Hamburger + Coke (Can)  $ 100
+
+Combo B
+Hamburger + French fries  $ 120
+
+Combo C
+Chicken Nuggets + Black Coffee  $ 140
+
+Combo D
+Chicken Nuggets + Apple Pie  $ 130
+
+Combo E
+Apple Pie + Coke (Can)  $ 70`;
+const mock9SourceB=`Green House
+For more information, please contact:
+Mark Hanks
+0900-000-000
+
+A. Clerks
+* At least 3-year experience needed
+* Be able to speak English
+* Work 13:00 - 21:00 every day
+
+B. Salesperson
+* Excellent communication (溝通) skills
+* College
+* Ad sales experience
+* 28 hours per week
+
+C. Secretary
+* No experience needed
+* Type at least 70 words per minute
+* Be able to work overtime
+
+D. Driver
+* At least 2-year experience needed
+* Work 9:00 a.m. - 6:00 p.m.`;
+const mock9SourceC=`Coffee is very popular with people in Taiwan. Many people drink at least a cup of coffee every day. It's convenient to buy a cup of coffee because there are thousands of coffee shops in Taiwan.
+
+There are some good reasons to drink coffee. The first is having less risk of heart disease (疾病). If you drink three cups of coffee a day, you will decrease (減少) your chance of having a heart attack. Then, drinking coffee is good for health. The third, coffee can keep you awake. Finally, coffee drinkers may have strong DNA.
+
+Even though there are some benefits (好處) of drinking coffee, don't drink too much a day.`;
+const mock9Questions={31:'What is Uncle Ted?',32:'Vicky bought an apple pie, a chicken hamburger and two cans of Coke. How much did she pay?',33:"You can't order _____ here.",34:'Which of the sentences is NOT TRUE?',35:'Who will be interested in this ad?',36:"Willy called Mark Hanks this morning. What's his purpose (目的)?",37:'Fiona can type 80 words a minute. She just graduated from college. Which job is suitable (適合的) for her?',38:'What is the main idea of this passage (短文)?',39:'According to this passage, what is popular with people in Taiwan?',40:'Which of the sentences is TRUE?'};
+window.MockEnglishQuestionBank.filter(q=>q.paper===9&&q.no>=31&&q.no<=40).forEach(q=>{
+  const source=q.no<=34?mock9SourceA:q.no<=37?mock9SourceB:mock9SourceC;
+  q.stem=`[${q.no<=34?'A':q.no<=37?'B':'C'}]\n${source}\n\n${mock9Questions[q.no]}`;
+});
+
+// Tables are also shared reading sources: keep the complete table visible on
+// every question in the group instead of a shortened per-question fragment.
+Object.keys(mockReadingGroups).forEach(paper=>mockReadingGroups[paper].forEach(([from,to])=>{
+  const group=window.MockEnglishQuestionBank.filter(q=>q.paper===+paper&&q.no>=from&&q.no<=to);
+  const tables=group.filter(q=>q.table);
+  if(!tables.length) return;
+  const complete=tables.reduce((a,b)=>(b.table||'').length>(a.table||'').length?b:a).table;
+  if(complete) group.forEach(q=>{q.table=complete;});
+}));
