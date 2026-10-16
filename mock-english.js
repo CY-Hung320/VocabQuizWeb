@@ -82,6 +82,42 @@
     };
     nextPart();
   }
+  // Dialogue-aware reader: lines such as "Emma: ..." are spoken as roles
+  // instead of reading the character names aloud.  Voice selection uses common
+  // given-name gender cues and falls back safely when the device has one voice.
+  const FEMALE_NAMES=new Set(['alice','alisa','amy','anna','beth','cindy','dolly','emma','emily','fanny','grace','helen','jill','judy','kelly','lisa','linda','meg','mina','molly','rose','rita','sally','sandra','sonia','tina','vicky','wendy']);
+  const MALE_NAMES=new Set(['adam','allen','ben','bill','brad','david','don','eric','frank','fred','gary','harry','jason','ken','mark','mike','neil','peter','roy','sam','sean','steve','ted','thomas','tom','tony','willy','william']);
+  const speakerGender=name=>FEMALE_NAMES.has(String(name).toLowerCase())?'female':MALE_NAMES.has(String(name).toLowerCase())?'male':'neutral';
+  const preferredVoice=(voices,gender)=>{
+    const english=voices.filter(v=>/^en/i.test(v.lang));
+    const list=english.length?english:voices;
+    const cue=gender==='female'?/zira|samantha|ava|aria|female|woman|victoria|jenny/i:gender==='male'?/david|mark|guy|daniel|male|man|george/i:/^$/;
+    return list.find(v=>cue.test(`${v.name} ${v.voiceURI}`))||list[gender==='male'&&list.length>1?1:0];
+  };
+  function speakMockQuestion(){
+    const q=activeMockQuestion();
+    if(!q||!('speechSynthesis' in window))return;
+    const run=++mockSpeechRun;
+    window.speechSynthesis.cancel();
+    const source=session?.kind==='exam'?examStem(q):q.stem;
+    const dialogue=String(source||'').split(/\n+/).map(line=>{
+      const match=line.match(/^\s*([A-Za-z][A-Za-z .'-]{0,28}):\s*(.+)$/);
+      return match?{text:match[2],speaker:match[1].trim()}:null;
+    }).filter(Boolean);
+    const parts=(dialogue.length?dialogue:[{text:source,speaker:''}]).concat(q.options.map((option,index)=>({text:`${'ABCD'[index]}. ${option}`,speaker:''})))
+      .flatMap(part=>(String(part.text||'').match(/[\u3400-\u9fff]+|[^\u3400-\u9fff]+/g)||[]).map(text=>({...part,text:text.trim()})).filter(part=>part.text));
+    const voices=window.speechSynthesis.getVoices();let index=0;
+    const nextPart=()=>{
+      if(run!==mockSpeechRun||index>=parts.length)return;
+      const part=parts[index++],isChinese=/[\u3400-\u9fff]/.test(part.text),voice=new SpeechSynthesisUtterance(part.text);
+      voice.lang=isChinese?'zh-TW':'en-US';
+      const selected=isChinese?(voices.find(v=>/zh[-_]TW/i.test(v.lang))||voices.find(v=>/^zh/i.test(v.lang))):preferredVoice(voices,speakerGender(part.speaker));
+      if(selected)voice.voice=selected;
+      voice.rate=isChinese?.9:.78;
+      voice.onend=nextPart;voice.onerror=nextPart;window.speechSynthesis.speak(voice);
+    };
+    nextPart();
+  }
   function installMockSpeechControls(){
     if(!document.getElementById('mock-exam-feedback-style')){
       const style=document.createElement('style');
