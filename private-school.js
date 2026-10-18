@@ -581,6 +581,10 @@
     const limit=questionLimit(item);
     document.getElementById('ps-app').innerHTML=`<section class="ps-card ps-test"><header><button class="ps-back" onclick="PrivateSchool.home()">← 離開</button><span>私中專區 · ${typeLabel}</span><b>${state.index+1} / ${state.quiz.length}</b></header><div class="ps-progress"><i style="width:${(state.index/state.quiz.length)*100}%"></i></div>${item.passage?`<article class="ps-passage">${esc(item.passage)}</article>`:''}<div class="ps-qtype">${LESSONS[item.lesson]} · ${typeLabel}<b id="ps-timer" class="ps-timer">⏱ ${limit} 秒</b></div><div class="ps-question-row"><h2>${esc(item.stem)}</h2><button class="ps-speak" onclick="PrivateSchool.speakItem('${item.id}')" title="朗讀題目">🔊</button><button class="ps-stop-inline" onclick="PrivateSchool.stopSpeech()" title="停止朗讀">⏹ STOP</button></div><div class="ps-options">${item.opts.map((o,i)=>`<button onclick="PrivateSchool.answer(${i})"><b>${'ABCD'[i]}</b>${esc(o)}</button>`).join('')}</div><p class="ps-tip">字彙、文法、克漏字每題限時 30 秒；閱讀每題限時 60 秒。</p></section>`;
     startQuestionTimer(item);
+    // 每題進入畫面就自動朗讀；題目旁仍可手動重播，並可按 STOP 停止。
+    setTimeout(()=>{
+      if(state.quiz[state.index]===item && state.answers.length===state.index) speakItem(item.id);
+    },150);
   }
   function answer(choice,timedOut=false) {
     const item=state.quiz[state.index];
