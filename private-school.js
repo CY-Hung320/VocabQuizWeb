@@ -3,6 +3,7 @@
   'use strict';
   const KEY = 'private_school_wrong_v1';
   const MASTERED_KEY = 'private_school_mastered_v1';
+  const VOCAB_MASTERY_KEY = 'private_school_vocab_mastery_v1';
   const HISTORY_KEY = 'private_school_recent_questions_v1';
   const ATTEMPTS_KEY = 'private_school_attempts_v1';
   const CLOZE_ROUND_KEY = 'private_school_cloze_rounds_v1';
@@ -462,6 +463,8 @@
   const saveWrong = x => localStorage.setItem(KEY,JSON.stringify(x));
   const getMastered = () => { try { return JSON.parse(localStorage.getItem(MASTERED_KEY)||'{}'); } catch { return {}; } };
   const saveMastered = x => localStorage.setItem(MASTERED_KEY,JSON.stringify(x));
+  const getVocabMastery = () => { try { return JSON.parse(localStorage.getItem(VOCAB_MASTERY_KEY)||'{}'); } catch { return {}; } };
+  const saveVocabMastery = x => localStorage.setItem(VOCAB_MASTERY_KEY,JSON.stringify(x));
   const getHistory = () => { try { const x=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); return Array.isArray(x)?x:[]; } catch { return []; } };
   const saveHistory = x => localStorage.setItem(HISTORY_KEY,JSON.stringify(x));
   const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
@@ -509,11 +512,17 @@
     return match ? Number(match[1]) : null;
   };
   function chooseVocab(pool,n){
-    const wrong=getWrong(), history=getHistory(), groups=new Map();
+    const wrong=getWrong(), mastered=getMastered(), vocabMastery=getVocabMastery(), history=getHistory(), groups=new Map();
     pool.forEach(item=>{const id=vocabWordId(item); if(id!==null){if(!groups.has(id))groups.set(id,[]);groups.get(id).push(item);}});
     return [...groups.values()].map(items=>{
-      const unseen=items.filter(item=>!history.includes(item.id));
-      const candidates=unseen.length?unseen:items;
+      const wordId=vocabWordId(items[0]);
+      const isFamiliar=(vocabMastery[wordId]?.streak||0)>=5 || items.some(item=>mastered[item.id]);
+      const variants=items.filter(item=>/^vx[123]-/.test(item.id));
+      const originals=items.filter(item=>!/^vx[123]-/.test(item.id));
+      // 第一次一定先出原始掃描題；熟練後才切換成同 Unit 的變化問法。
+      const source=isFamiliar?(variants.length?variants:items):originals;
+      const unseen=source.filter(item=>!history.includes(item.id));
+      const candidates=unseen.length?unseen:source;
       return [...candidates].sort((a,b)=>(wrong[b.id]?.count||0)-(wrong[a.id]?.count||0)||Math.random()-.5)[0];
     }).sort((a,b)=>(wrong[b.id]?.count||0)-(wrong[a.id]?.count||0)||Math.random()-.5).slice(0,n);
   }
@@ -628,7 +637,22 @@
         wrong[a.id]={count:(old.count||0)+1, streak:0, at:Date.now(), type:item.type, lesson:item.lesson};
       }
     });
-    saveWrong(wrong); saveMastered(mastered);
+    const vocabMastery=getVocabMastery();
+    state.answers.forEach(a=>{
+      const item=BANK.find(x=>x.id===a.id), wordId=item&&vocabWordId(item);
+      if(wordId===null||wordId===undefined) return;
+      const record=vocabMastery[wordId]||{streak:0,unit:item.lesson};
+      record.streak=a.correct?(record.streak||0)+1:0;
+      record.unit=item.lesson;
+      record.lastId=item.id;
+      record.updatedAt=Date.now();
+      vocabMastery[wordId]=record;
+      if(record.streak>=5){
+        mastered[item.id]={count:1,streak:record.streak,masteredAt:record.updatedAt,type:'vocab',lesson:item.lesson,wordId};
+        delete wrong[item.id];
+      }
+    });
+    saveWrong(wrong); saveMastered(mastered); saveVocabMastery(vocabMastery);
     const score=Math.round(correct/state.quiz.length*100), weak=Object.keys(wrong).length, familiar=Object.keys(mastered).length;
     const totalSeconds=state.answers.reduce((sum,answer)=>sum+(answer.elapsedSeconds||0),0);
     const onlyOneClozeUnit=state.quiz.length===20&&state.quiz.every(item=>item.type==='cloze'&&item.lesson===state.quiz[0].lesson);
