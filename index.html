@@ -1783,6 +1783,37 @@ function setMockExamAvatar() {
   if (target) target.src = 'assets/mock-exam-avatar.jpg';
 }
 setMockExamAvatar();
+function openAvatarViewer(event, image) {
+  if (event) event.stopPropagation();
+  const viewer = document.getElementById('avatar-viewer');
+  const preview = document.getElementById('avatar-viewer-image');
+  if (!viewer || !preview || !image || !image.src) return;
+  preview.src = image.src;
+  preview.style.transform = 'scale(1)';
+  viewer.classList.add('open');
+}
+function closeAvatarViewer() {
+  const viewer = document.getElementById('avatar-viewer');
+  if (viewer) viewer.classList.remove('open');
+}
+function changeAvatarZoom(delta) {
+  const preview = document.getElementById('avatar-viewer-image');
+  if (!preview) return;
+  const current = Number(preview.dataset.zoom || 1);
+  const next = Math.max(.5, Math.min(3, current + delta));
+  preview.dataset.zoom = next;
+  preview.style.transform = `scale(${next})`;
+}
+function setupAvatarViewer() {
+  const elementary = document.querySelector('.zone-card.elementary .zone-avatar');
+  if (elementary) elementary.innerHTML = '<img id="elementary-zone-avatar" src="assets/elementary-avatar.jpg" alt="小學專區大頭貼">';
+  document.querySelectorAll('#private-zone-avatar,#mock-zone-avatar,#elementary-zone-avatar').forEach(image => {
+    image.addEventListener('click', event => openAvatarViewer(event, image));
+  });
+  if (document.getElementById('avatar-viewer')) return;
+  document.body.insertAdjacentHTML('beforeend', `<style>.avatar-viewer{display:none;position:fixed;inset:0;z-index:20000;background:rgba(15,23,42,.82);align-items:center;justify-content:center;padding:20px}.avatar-viewer.open{display:flex}.avatar-viewer-panel{position:relative;max-width:min(92vw,760px);max-height:92vh;padding:18px;border-radius:20px;background:#fff;box-shadow:0 20px 70px #0008;text-align:center;overflow:hidden}.avatar-viewer-panel>img{display:block;max-width:82vw;max-height:76vh;object-fit:contain;border-radius:12px;transition:transform .2s ease;transform-origin:center}.avatar-viewer-close{position:absolute;right:8px;top:6px;width:36px;height:36px;border:0;border-radius:50%;background:#312e81;color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;z-index:1}.avatar-viewer-controls{display:flex;justify-content:center;gap:8px;margin-top:14px}.avatar-viewer-controls button{border:0;border-radius:9px;padding:8px 14px;background:#eef2ff;color:#312e81;font-weight:800;cursor:pointer}</style><div id="avatar-viewer" class="avatar-viewer" role="dialog" aria-modal="true" aria-label="大頭貼檢視器" onclick="closeAvatarViewer()"><div class="avatar-viewer-panel" onclick="event.stopPropagation()"><button class="avatar-viewer-close" onclick="closeAvatarViewer()" aria-label="關閉">×</button><img id="avatar-viewer-image" alt="大頭貼放大檢視"><div class="avatar-viewer-controls"><button onclick="changeAvatarZoom(-.25)">−</button><button onclick="changeAvatarZoom(.25)">＋</button><button onclick="document.getElementById('avatar-viewer-image').style.transform='scale(1)';document.getElementById('avatar-viewer-image').dataset.zoom='1'">重設</button></div></div></div>`);
+}
+setupAvatarViewer();
 function goMenu() {
   stopConfetti(); hidePhoto(); clearPeCD();
   selMode = null; wsSelStart = null;
