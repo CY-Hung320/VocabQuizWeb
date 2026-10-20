@@ -487,7 +487,7 @@ body{
       <div><h2>🎯 嘉駿的私中專區</h2><p>私中入學英語衝刺：字彙、文法、克漏字、閱讀與錯題加強。</p></div><span class="zone-arrow">›</span>
     </button>
     <button class="zone-card private" onclick="MockEnglish.open()">
-      <div class="zone-avatar">📝</div>
+      <div class="zone-avatar"><img id="mock-zone-avatar" src="assets/mock-exam-avatar.jpg" alt="私中英文模擬考大頭貼"/></div>
       <div><h2>📝 私中英文模擬考</h2><p>依原始掃描試卷作答：選擇試卷、倒計時與作答進度保存。</p></div><span class="zone-arrow">›</span>
     </button>
     <button class="zone-card elementary" onclick="openElementary()">
@@ -1778,6 +1778,11 @@ function setPrivateZoneAvatar() {
   if (source && target) target.src = source.src;
 }
 setPrivateZoneAvatar();
+function setMockExamAvatar() {
+  const target = document.getElementById('mock-zone-avatar');
+  if (target) target.src = 'assets/mock-exam-avatar.jpg';
+}
+setMockExamAvatar();
 function goMenu() {
   stopConfetti(); hidePhoto(); clearPeCD();
   selMode = null; wsSelStart = null;
