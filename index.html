@@ -1815,7 +1815,7 @@ function setupAvatarViewer() {
 }
 setupAvatarViewer();
 function goMenu() {
-  stopConfetti(); hidePhoto(); clearPeCD();
+  stopConfetti(); hidePhoto(); clearPeCD(); stopClozeSpeech();
   selMode = null; wsSelStart = null;
   lc2PlayTimers.forEach(clearTimeout); lc2PlayTimers = [];
   document.getElementById('mode-study').classList.remove('selected');
@@ -2889,6 +2889,7 @@ function clozeSemLabel() {
 }
 
 function startClozeQuiz() {
+  stopClozeSpeech();
   czState = buildClozeQuiz();
   const semLabel = clozeSemLabel();
   document.getElementById('pe-title').textContent =
@@ -2921,8 +2922,22 @@ function renderClozeIntro() {
 
 function czBegin() { czState.startTime = Date.now(); renderClozeQuestion(); }
 
+function stopClozeSpeech() {
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    speechSynthesis.onvoiceschanged = null;
+  }
+}
+
+function speakClozeQuestion() {
+  if (!czState || !czState.qs || !czState.qs[czState.idx] || !('speechSynthesis' in window)) return;
+  stopClozeSpeech();
+  speakCz(czState.qs[czState.idx].word[0]);
+}
+
 function renderClozeQuestion() {
   clearPeCD();
+  stopClozeSpeech();
   const s = czState;
   const q = s.qs[s.idx];
   const total = s.qs.length;
@@ -2959,16 +2974,18 @@ function renderClozeQuestion() {
         </button>`).join('')}
       </div>
     </div>
+    <div style="display:flex;justify-content:center;gap:8px;margin:0 0 14px">
+      <button onclick="speakClozeQuestion()" style="background:#667eea;color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:.85rem;font-weight:700;cursor:pointer">🔊 再聽一次</button>
+      <button onclick="stopClozeSpeech()" style="background:#dc2626;color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:.85rem;font-weight:700;cursor:pointer">⏹ STOP</button>
+    </div>
     <button id="pe-next-btn" onclick="czNext()"
       style="width:100%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:12px;padding:13px;font-size:1rem;font-weight:700;cursor:pointer;opacity:.35;pointer-events:none;transition:opacity .2s">
       ${isLast ? '完成作答 ✓' : '下一題 →'}
     </button>`;
-  // Speak the word once with female voice (voices may not be loaded yet on first call)
-  if (speechSynthesis.getVoices().length > 0) {
-    speakCz(q.word[0]);
-  } else {
-    speechSynthesis.onvoiceschanged = () => { speakCz(q.word[0]); speechSynthesis.onvoiceschanged = null; };
-  }
+  // Automatically read each new question once; do not read stale questions after navigation.
+  setTimeout(()=>{
+    if (czState===s && czState.qs[czState.idx]===q && q.ans===-1) speakClozeQuestion();
+  },150);
 }
 
 function czOptSelect(j) {
@@ -2990,6 +3007,7 @@ function czOptSelect(j) {
 }
 
 function czNext() {
+  stopClozeSpeech();
   const s = czState;
   if (s.idx >= s.qs.length - 1) { czFinish(); return; }
   s.idx++;
@@ -2998,6 +3016,7 @@ function czNext() {
 
 function czFinish() {
   clearPeCD();
+  stopClozeSpeech();
   let correct = 0;
   const wrongList = [];
   czState.qs.forEach(q => {
